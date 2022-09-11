@@ -78,7 +78,7 @@ def showMainWidgets():
     passEntry.grid(row=1, column=1, padx=(15,90), pady=(20,0))
     submitbtn.grid(row=2, column=0, columnspan=2, pady=(30,0))
     loginErrorLabel.grid(row=3, column=0, pady=(15,15), columnspan=2)
-    loginErrorLabel
+    loginErrorLabel.grid_remove()
 
 def hideMainWidgets():
     global nameLabel
@@ -91,6 +91,7 @@ def hideMainWidgets():
     passLabel.grid_remove()
     passEntry.grid_remove()
     submitbtn.grid_remove()
+    loginErrorLabel.grid_remove()
     
 
 def submitOnClick(event = None):
@@ -127,7 +128,6 @@ passLabel = ttk.Label(root, text="Enter your Password:", font="mont")
 passEntry = ttk.Entry(root, font="mont", textvariable=uidData, show="*")
 submitbtn = ttk.Button(root, text="Login",command=submitOnClick, style="my.TButton")
 loginErrorLabel = ttk.Label(root, font="mont", text="Sorry but it seems like\nyou aren't in the Voters' List!", justify=CENTER)
-
 
 openDebugWin()
 showMainWidgets()
