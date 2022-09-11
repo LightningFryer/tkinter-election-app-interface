@@ -17,7 +17,6 @@ root.resizable(0,0)
 #btn style
 btnstyle = ttk.Style().configure("my.TButton", font=("mont",))
 
-
 #radiobtn style
 radioStyle = ttk.Style().configure("my.TRadiobutton", font=("mont",))
 
@@ -27,6 +26,7 @@ uidData = StringVar()
 candData = StringVar()
 
 def openAdminWin():
+    hideMainWidgets()
     global btnstyle
     global adminWinLabel
     global voterOpBtn 
@@ -44,13 +44,13 @@ def openAdminWin():
     adminSettingBtn = ttk.Button(root, text="Admin Settings", style="my.TButton")
     adminLogoutBtn = ttk.Button(root, text="Logout", style="my.TButton", padding=(20,3,20,3), command=adminLogout)
 
-    adminWinLabel.grid(row=0, column=0, columnspan=2, pady=(10,0), padx=(110,0))
-    voterOpBtn.grid(row=1, column=0, padx=(10,5), pady=(10,10))
+    adminWinLabel.grid(row=0, column=0, columnspan=2, pady=(40,5), padx=(50,0))
+    voterOpBtn.grid(row=1, column=0, padx=(60,5), pady=(10,10), ipadx=15)
     candidateOpBtn.grid(row=1, column=1, padx=(10,5), pady=(10,10))
-    setVoteSessionBtn.grid(row=2, column=0, padx=(10,5), pady=(10,10))
+    setVoteSessionBtn.grid(row=2, column=0, padx=(60,5), pady=(10,10), ipadx=15)
     startVoterSessionBtn.grid(row=2, column=1, padx=(10,5), pady=(10,10))
-    adminSettingBtn.grid(row=3, column=0, padx=(10,5), pady=(10,10), columnspan=2)
-    adminLogoutBtn.grid(row=4, column=0, padx=(10,5), pady=(10,10), columnspan=2)
+    adminSettingBtn.grid(row=3, column=0, padx=(30,0), pady=(10,10), columnspan=2)
+    adminLogoutBtn.grid(row=4, column=0, padx=(30,0), pady=(10,10), columnspan=2)
 
 def adminLogout():
     adminWinLabel.grid_remove()
@@ -69,7 +69,8 @@ def openDebugWin():
     debugWin.title("Debug Operations")
     consoleVoterListBtn = ttk.Button(debugWin, text="Voter List", command=display_voters_debug, style="my.TButton").grid(row=0, column=0, padx=15, ipadx=35, pady=15)
     consoleCandidateListBtn = ttk.Button(debugWin, text="Candidate List", command=display_candidates_debug, style="my.TButton").grid(row=1, column=0, ipadx=30, pady=15)
-    hideallWidgets = ttk.Button(debugWin, text="Hide all Widgets", command=hideMainWidgets, style="my.TButton").grid(row=2, column=0, pady=15, padx=15)
+    hideallWidgets = ttk.Button(debugWin, text="Hide all Widgets", command=hideMainWidgets, style="my.TButton").grid(row=2, column=0, pady=15, padx=15, ipadx=35,)
+    autoLogin = ttk.Button(debugWin, text="Admin Login", command=openAdminWin, style="my.TButton").grid(row=3, column=0, padx=15, pady=15, ipadx=35,)
 
 def showMainWidgets():
     nameLabel.grid(row=0, column=0, sticky=W, padx=(110,30), pady=(130,0))
@@ -95,7 +96,6 @@ def hideMainWidgets():
     
 
 def submitOnClick(event = None):
-    hideMainWidgets()
     global getName
     getName = nameData.get()
     getUID = uidData.get()
@@ -115,7 +115,6 @@ def submitOnClick(event = None):
         loginErrorLabel.grid_remove()
         openAdminWin()
     else:
-        showMainWidgets()
         loginErrorLabel.grid()
 
 
