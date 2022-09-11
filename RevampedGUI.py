@@ -4,13 +4,13 @@ from helper import *
 from eAuth import *
 from modify import *
 from election import *
+import sv_ttk as theme
 
 
 #main window
 root = Tk()
 root.title("Election App Mockup")
-root.tk.call("source", "azure.tcl")
-root.tk.call("set_theme", "dark")
+theme.set_theme("dark")
 root.geometry("600x400")
 root.resizable(0,0)
 
@@ -44,7 +44,7 @@ def openAdminWin():
     adminSettingBtn = ttk.Button(root, text="Admin Settings", style="my.TButton")
     adminLogoutBtn = ttk.Button(root, text="Logout", style="my.TButton", padding=(20,3,20,3), command=adminLogout)
 
-    adminWinLabel.grid(row=0, column=0, columnspan=2, pady=(40,5), padx=(50,0))
+    adminWinLabel.grid(row=0, column=0, columnspan=2, pady=(70,5), padx=(50,0))
     voterOpBtn.grid(row=1, column=0, padx=(60,5), pady=(10,10), ipadx=15)
     candidateOpBtn.grid(row=1, column=1, padx=(10,5), pady=(10,10))
     setVoteSessionBtn.grid(row=2, column=0, padx=(60,5), pady=(10,10), ipadx=15)
