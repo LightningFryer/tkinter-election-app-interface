@@ -11,6 +11,8 @@ root = Tk()
 root.title("Election App Mockup")
 root.tk.call("source", "azure.tcl")
 root.tk.call("set_theme", "dark")
+root.geometry("600x400")
+root.resizable(0,0)
 
 #btn style
 btnstyle = ttk.Style().configure("my.TButton", font=("mont",))
@@ -24,34 +26,41 @@ nameData = StringVar()
 uidData = StringVar()
 candData = StringVar()
 
-# def castOnClick():
-#     voterWinLabel.destroy()
-
-# def openVoterWin():
-#     global btnstyle
-#     global voterWin
-#     voterWin = Toplevel()
-#     voterWin.title("Cast your vote!")
-#     voterWinLabel = ttk.Label(voterWin, text="Cast your vote using by clicking\none of the voter names below", justify="center", font="mont").grid(row=0, column=0, columnspan=2, padx=15, pady=15)
-#     castVoteBtn = ttk.Button(voterWin, text="Cast my vote!", style="my.TButton").grid(row=4, column=0, columnspan=2, pady=15)
-#     candOne = ttk.Radiobutton(voterWin, text="Candidate One",style="my.TRadiobutton", variable=candData, value=1).grid(row=2, column=0, padx=(15,0), sticky=W)
-#     candTwo = ttk.Radiobutton(voterWin, text="Candidate Two",style="my.TRadiobutton", variable=candData, value=2).grid(row=2, column=1, padx=(0, 15))
-#     candThree = ttk.Radiobutton(voterWin, text="Candidate Three",style="my.TRadiobutton", variable=candData, value=3).grid(row=3, column=0, padx=(15,0))
-#     candFour = ttk.Radiobutton(voterWin, text="Candidate Four",style="my.TRadiobutton", variable=candData, value=4).grid(row=3, column=1, padx=(0,15))
-#     # voterWinSep = ttk.Separator(voterWin, orient=HORIZONTAL).grid(row=1, column=0, sticky=EW, columnspan=2) #Doesn't look good imo
-
 def openAdminWin():
     global btnstyle
-    global adminWin
-    adminWin = Toplevel()
-    adminWin.title("Admin Controls Panel")
-    adminWinLabel = ttk.Label(adminWin, text="Welcome Admin", font="mont").grid(row=0, column=0, columnspan=2, pady=(10,0))
-    voterOpBtn = ttk.Button(adminWin, text="Configure Voters' List", style="my.TButton").grid(row=1, column=0, padx=(10,5), pady=(10,10))
-    candidateOpBtn = ttk.Button(adminWin, text="Configure Candidates' List", style="my.TButton").grid(row=1, column=1, padx=(10,5), pady=(10,10))
-    setVoteSessionBtn = ttk.Button(adminWin, text="Setup Voting Session", style="my.TButton").grid(row=2, column=0, padx=(10,5), pady=(10,10))
-    startVoterSessionBtn = ttk.Button(adminWin, text="Start a Voting Session", style="my.TButton", padding=(25,3,25,3)).grid(row=2, column=1, padx=(10,5), pady=(10,10))
-    adminSettingBtn = ttk.Button(adminWin, text="Admin Settings", style="my.TButton").grid(row=3, column=0, padx=(10,5), pady=(10,10), columnspan=2)
-    adminLogoutBtn = ttk.Button(adminWin, text="Logout", style="my.TButton", padding=(20,3,20,3), command=adminWin.destroy).grid(row=4, column=0, padx=(10,5), pady=(10,10), columnspan=2)
+    global adminWinLabel
+    global voterOpBtn 
+    global candidateOpBtn
+    global setVoteSessionBtn
+    global startVoterSessionBtn
+    global adminSettingBtn
+    global adminLogoutBtn
+
+    adminWinLabel = ttk.Label(root, text="Welcome Admin", font="mont")
+    voterOpBtn = ttk.Button(root, text="Configure Voters' List", style="my.TButton")
+    candidateOpBtn = ttk.Button(root, text="Configure Candidates' List", style="my.TButton")
+    setVoteSessionBtn = ttk.Button(root, text="Setup Voting Session", style="my.TButton")
+    startVoterSessionBtn = ttk.Button(root, text="Start a Voting Session", style="my.TButton", padding=(25,3,25,3))
+    adminSettingBtn = ttk.Button(root, text="Admin Settings", style="my.TButton")
+    adminLogoutBtn = ttk.Button(root, text="Logout", style="my.TButton", padding=(20,3,20,3), command=adminLogout)
+
+    adminWinLabel.grid(row=0, column=0, columnspan=2, pady=(10,0), padx=(110,0))
+    voterOpBtn.grid(row=1, column=0, padx=(10,5), pady=(10,10))
+    candidateOpBtn.grid(row=1, column=1, padx=(10,5), pady=(10,10))
+    setVoteSessionBtn.grid(row=2, column=0, padx=(10,5), pady=(10,10))
+    startVoterSessionBtn.grid(row=2, column=1, padx=(10,5), pady=(10,10))
+    adminSettingBtn.grid(row=3, column=0, padx=(10,5), pady=(10,10), columnspan=2)
+    adminLogoutBtn.grid(row=4, column=0, padx=(10,5), pady=(10,10), columnspan=2)
+
+def adminLogout():
+    adminWinLabel.grid_remove()
+    voterOpBtn .grid_remove()
+    candidateOpBtn.grid_remove()
+    setVoteSessionBtn.grid_remove()
+    startVoterSessionBtn.grid_remove()
+    adminSettingBtn.grid_remove()
+    adminLogoutBtn.grid_remove()
+    showMainWidgets()
 
 def openDebugWin():
     global btnstyle
@@ -60,15 +69,37 @@ def openDebugWin():
     debugWin.title("Debug Operations")
     consoleVoterListBtn = ttk.Button(debugWin, text="Voter List", command=display_voters_debug, style="my.TButton").grid(row=0, column=0, padx=15, ipadx=35, pady=15)
     consoleCandidateListBtn = ttk.Button(debugWin, text="Candidate List", command=display_candidates_debug, style="my.TButton").grid(row=1, column=0, ipadx=30, pady=15)
+    hideallWidgets = ttk.Button(debugWin, text="Hide all Widgets", command=hideMainWidgets, style="my.TButton").grid(row=2, column=0, pady=15, padx=15)
+
+def showMainWidgets():
+    nameLabel.grid(row=0, column=0, sticky=W, padx=(110,30), pady=(130,0))
+    nameEntry.grid(row=0, column=1, padx=(15,90), pady=(130,0))
+    passLabel.grid(row=1, column=0, sticky=W, padx=(110,0), pady=(20,0))
+    passEntry.grid(row=1, column=1, padx=(15,90), pady=(20,0))
+    submitbtn.grid(row=2, column=0, columnspan=2, pady=(30,0))
+    loginErrorLabel.grid(row=3, column=0, pady=(15,15), columnspan=2)
+    loginErrorLabel
+
+def hideMainWidgets():
+    global nameLabel
+    global nameEntry
+    global passLabel
+    global passEntry
+    global submitbtn
+    nameLabel.grid_remove()
+    nameEntry.grid_remove()
+    passLabel.grid_remove()
+    passEntry.grid_remove()
+    submitbtn.grid_remove()
+    
 
 def submitOnClick(event = None):
+    hideMainWidgets()
     global getName
     getName = nameData.get()
     getUID = uidData.get()
-    loginErrorLabel = ttk.Label(root, font="mont", text="Sorry but it seems like\nyou aren't in the Voters' List!", justify=CENTER)
-    adminSuccessLabel = ttk.Label(root, font="mont", text=f"Successfully logged in!\nWelcome {getName}!", justify=CENTER, padding=(70,0,70,0))
-    loginErrorLabel.forget()
-    adminSuccessLabel.forget()
+    
+    loginErrorLabel.grid_remove()
     adminListDAT = open("Data/cred.dat", "rb")
     found = 0
     try:
@@ -79,32 +110,25 @@ def submitOnClick(event = None):
                 break
     except EOFError:
         adminListDAT.close()
-    
     if found == 1:
-        loginErrorLabel.destroy()
-        adminSuccessLabel.grid(row=3, column=0, pady=(0,15), columnspan=2)
-        try:
-            adminWin.destroy()
-        except NameError:
-            pass
+        loginErrorLabel.grid_remove()
         openAdminWin()
     else:
-        adminSuccessLabel.destroy()
-        loginErrorLabel.grid(row=3, column=0, pady=(0,15), columnspan=2)
-        try:
-            adminWin.destroy()
-        except NameError:
-            pass
+        showMainWidgets()
+        loginErrorLabel.grid()
 
 
 root.bind("<Return>", submitOnClick)
 
 #main window widgets
-nameLabel = ttk.Label(root, text="Enter your name:", font="mont").grid(row=0, column=0, padx=(100,10), pady=(100,10), sticky=W)
-nameEntry = ttk.Entry(root, font="mont", textvariable=nameData).grid(row=0, column=1,padx=(10,100), pady=(100,10))
-passLabel = ttk.Label(root, text="Enter your Password:", font="mont").grid(row=1, column=0, sticky=W, padx=(100,10), pady=(10,15))
-passEntry = ttk.Entry(root, font="mont", textvariable=uidData, show="*").grid(row=1, column=1, padx=(10,100), pady=(10,15))
-submitbtn = ttk.Button(root, text="Submit",command=submitOnClick, style="my.TButton").grid(row=2, column=0, pady=(5,100), columnspan=2)
+nameLabel = ttk.Label(root, text="Enter your name:", font="mont")
+nameEntry = ttk.Entry(root, font="mont", textvariable=nameData)
+passLabel = ttk.Label(root, text="Enter your Password:", font="mont")
+passEntry = ttk.Entry(root, font="mont", textvariable=uidData, show="*")
+submitbtn = ttk.Button(root, text="Login",command=submitOnClick, style="my.TButton")
+loginErrorLabel = ttk.Label(root, font="mont", text="Sorry but it seems like\nyou aren't in the Voters' List!", justify=CENTER)
+
 
 openDebugWin()
+showMainWidgets()
 root.mainloop()
