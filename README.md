@@ -7,3 +7,6 @@ You seriously didn't think that people would vote through a console, did you?
 
 Credits to rbdende for making an awesome tkinter theme!
 Find the Sun Valley theme here: https://github.com/rdbende/Sun-Valley-ttk-theme
+
+Also this project definitely would not have come to life wthout its main codebase which can be found here: https://github.com/Anantu05/Election-App
+Big thanks to Anantu05 and alpha-og for polishing the election app console codebase
