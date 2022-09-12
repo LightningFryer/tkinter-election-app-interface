@@ -3,7 +3,12 @@ Using the Election App code meant for the console and porting it over to a tkint
 
 You seriously didn't think that people would vote through a console, did you?
 
+# Screenshots
 ![image](https://user-images.githubusercontent.com/91123163/189565463-76023847-3752-4b48-a411-e6fadb8c9676.png)
+
+![image](https://user-images.githubusercontent.com/91123163/189607552-df2f6150-149a-4915-9432-0d5a548e598d.png)
+
+![image](https://user-images.githubusercontent.com/91123163/189607625-633cb972-cab0-4a00-9862-60b980bec626.png)
 
 Credits to rbdende for making an awesome tkinter theme!
 Find the Sun Valley theme here: https://github.com/rdbende/Sun-Valley-ttk-theme
