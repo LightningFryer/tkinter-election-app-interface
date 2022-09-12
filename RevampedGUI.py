@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tracemalloc import start
 from helper import *
 from eAuth import *
 from modify import *
@@ -26,7 +27,8 @@ uidData = StringVar()
 candData = StringVar()
 
 def openAdminWin():
-    hideMainWidgets()
+    L = [nameLabel, nameEntry, passLabel, passEntry, submitbtn, loginErrorLabel]
+    hideWidgetsOnScreen(L)
     global btnstyle
     global adminWinLabel
     global voterOpBtn 
@@ -70,8 +72,8 @@ def openDebugWin():
     debugWin.title("Debug Operations")
     consoleVoterListBtn = ttk.Button(debugWin, text="Voter List", command=display_voters_debug, style="my.TButton").grid(row=0, column=0, padx=15, ipadx=35, pady=15)
     consoleCandidateListBtn = ttk.Button(debugWin, text="Candidate List", command=display_candidates_debug, style="my.TButton").grid(row=1, column=0, ipadx=30, pady=15)
-    hideallWidgets = ttk.Button(debugWin, text="Hide all Widgets", command=hideMainWidgets, style="my.TButton").grid(row=2, column=0, pady=15, padx=15, ipadx=35,)
-    autoLogin = ttk.Button(debugWin, text="Admin Login", command=openAdminWin, style="my.TButton").grid(row=3, column=0, padx=15, pady=15, ipadx=35,)
+    # hideallWidgets = ttk.Button(debugWin, text="Hide all Widgets", command=hideMainWidgets, style="my.TButton").grid(row=2, column=0, pady=15, padx=15, ipadx=35,)
+    autoLogin = ttk.Button(debugWin, text="Admin Login", command=openAdminWin, style="my.TButton").grid(row=2, column=0, padx=15, pady=15, ipadx=35,)
 
 def showMainWidgets():
     nameLabel.grid(row=1, column=0, sticky=W, padx=(110,30), pady=(130,0))
@@ -81,20 +83,6 @@ def showMainWidgets():
     submitbtn.grid(row=3, column=0, columnspan=2, pady=(30,0))
     loginErrorLabel.grid(row=4, column=0, pady=(15,15), columnspan=2)
     loginErrorLabel.grid_remove()
-
-def hideMainWidgets():
-    global nameLabel
-    global nameEntry
-    global passLabel
-    global passEntry
-    global submitbtn
-    nameLabel.grid_remove()
-    nameEntry.grid_remove()
-    passLabel.grid_remove()
-    passEntry.grid_remove()
-    submitbtn.grid_remove()
-    loginErrorLabel.grid_remove()
-    
 
 def submitOnClick(event = None):
     global getName
@@ -121,17 +109,9 @@ def submitOnClick(event = None):
 
 root.bind("<Return>", submitOnClick)
 
-def hideAdminWidgets():
-    adminWinLabel.grid_remove()
-    voterOpBtn .grid_remove()
-    candidateOpBtn.grid_remove()
-    setVoteSessionBtn.grid_remove()
-    startVoterSessionBtn.grid_remove()
-    adminSettingBtn.grid_remove()
-    adminLogoutBtn.grid_remove()
-
 def openAdminSettings():
-    hideAdminWidgets()
+    L = [adminWinLabel, voterOpBtn, candidateOpBtn, setVoteSessionBtn, startVoterSessionBtn, adminSettingBtn, adminLogoutBtn]
+    hideWidgetsOnScreen(L)
     global btnstyle
     global addAdminProfile
     global delAdminProfile
@@ -153,6 +133,26 @@ def goBack():
     updateAdminProfile.grid_remove()
     backButton.grid_remove()
     openAdminWin()
+
+def hideWidgetsOnScreen(listOfWidgets):
+    for i in listOfWidgets:
+        i.grid_forget()
+
+def showWidgetsOnScreen(listOfWidgets):
+    for i in listOfWidgets:
+        i.grid()
+
+# def adminCreate(): #Allows the admin to add a new admin user
+#     adminName = input("Admin Name: ")
+#     adminPassword = input("Password: ")
+#     if confirm():
+#         cred = {"Admin Name":caesarCipher.caesarEncrypt(adminName), "Password":caesarCipher.caesarEncrypt(adminPassword)} #Dictionary containing new admin details to be dumped
+
+#         with open("Data/cred.dat", "ab") as f: #Dumping the new admin's data
+#             pickle.dump(cred, f) 
+#         print(f"Added {adminName} as an administrator!")
+#     else:
+#         print("Aborting...")
 
 #main window widgets
 nameLabel = ttk.Label(root, text="Enter your name:", font="mont")
