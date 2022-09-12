@@ -41,7 +41,7 @@ def openAdminWin():
     candidateOpBtn = ttk.Button(root, text="Configure Candidates' List", style="my.TButton")
     setVoteSessionBtn = ttk.Button(root, text="Setup Voting Session", style="my.TButton")
     startVoterSessionBtn = ttk.Button(root, text="Start a Voting Session", style="my.TButton", padding=(25,3,25,3))
-    adminSettingBtn = ttk.Button(root, text="Admin Settings", style="my.TButton")
+    adminSettingBtn = ttk.Button(root, text="Admin Settings", style="my.TButton", command=openAdminSettings)
     adminLogoutBtn = ttk.Button(root, text="Logout", style="my.TButton", padding=(20,3,20,3), command=adminLogout)
 
     adminWinLabel.grid(row=0, column=0, columnspan=2, pady=(70,5), padx=(50,0))
@@ -51,6 +51,7 @@ def openAdminWin():
     startVoterSessionBtn.grid(row=2, column=1, padx=(10,5), pady=(10,10))
     adminSettingBtn.grid(row=3, column=0, padx=(30,0), pady=(10,10), columnspan=2)
     adminLogoutBtn.grid(row=4, column=0, padx=(30,0), pady=(10,10), columnspan=2)
+    
 
 def adminLogout():
     adminWinLabel.grid_remove()
@@ -73,12 +74,12 @@ def openDebugWin():
     autoLogin = ttk.Button(debugWin, text="Admin Login", command=openAdminWin, style="my.TButton").grid(row=3, column=0, padx=15, pady=15, ipadx=35,)
 
 def showMainWidgets():
-    nameLabel.grid(row=0, column=0, sticky=W, padx=(110,30), pady=(130,0))
-    nameEntry.grid(row=0, column=1, padx=(15,90), pady=(130,0))
-    passLabel.grid(row=1, column=0, sticky=W, padx=(110,0), pady=(20,0))
-    passEntry.grid(row=1, column=1, padx=(15,90), pady=(20,0))
-    submitbtn.grid(row=2, column=0, columnspan=2, pady=(30,0))
-    loginErrorLabel.grid(row=3, column=0, pady=(15,15), columnspan=2)
+    nameLabel.grid(row=1, column=0, sticky=W, padx=(110,30), pady=(130,0))
+    nameEntry.grid(row=1, column=1, padx=(15,90), pady=(130,0))
+    passLabel.grid(row=2, column=0, sticky=W, padx=(110,0), pady=(20,0))
+    passEntry.grid(row=2, column=1, padx=(15,90), pady=(20,0))
+    submitbtn.grid(row=3, column=0, columnspan=2, pady=(30,0))
+    loginErrorLabel.grid(row=4, column=0, pady=(15,15), columnspan=2)
     loginErrorLabel.grid_remove()
 
 def hideMainWidgets():
@@ -119,6 +120,39 @@ def submitOnClick(event = None):
 
 
 root.bind("<Return>", submitOnClick)
+
+def hideAdminWidgets():
+    adminWinLabel.grid_remove()
+    voterOpBtn .grid_remove()
+    candidateOpBtn.grid_remove()
+    setVoteSessionBtn.grid_remove()
+    startVoterSessionBtn.grid_remove()
+    adminSettingBtn.grid_remove()
+    adminLogoutBtn.grid_remove()
+
+def openAdminSettings():
+    hideAdminWidgets()
+    global btnstyle
+    global addAdminProfile
+    global delAdminProfile
+    global updateAdminProfile
+    global backButton
+    addAdminProfile = ttk.Button(root, text="Create a new Admin Profile", style="my.TButton")
+    delAdminProfile = ttk.Button(root, text="Delete an Admin Profile   ", style="my.TButton")
+    updateAdminProfile = ttk.Button(root, text="Update an Admin Profile", style="my.TButton")
+    backButton = ttk.Button(root, text="< Back", style="my.TButton", command=goBack)
+
+    addAdminProfile.grid(row=1, column=0, padx=(65,5), pady=(90,15))
+    delAdminProfile.grid(row=1, column=1, padx=(5,60), pady=(90,15))
+    updateAdminProfile.grid(row=2, column=0, columnspan=2)
+    backButton.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
+
+def goBack():
+    addAdminProfile.grid_remove()
+    delAdminProfile.grid_remove()
+    updateAdminProfile.grid_remove()
+    backButton.grid_remove()
+    openAdminWin()
 
 #main window widgets
 nameLabel = ttk.Label(root, text="Enter your name:", font="mont")
