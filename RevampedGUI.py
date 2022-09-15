@@ -39,11 +39,17 @@ def openAdminWin():
 def showVoterList():
     hideWidgetsOnScreen([nameLabel, nameEntry, passLabel, passEntry, loginbtn, loginErrorLabel])
     voterListFrame = ttk.Frame(root)
-    voterListFrame.pack(fill=BOTH, expand=1, padx=(200,0))
+    voterListFrame.grid(row=0, column=0, sticky=NSEW, ipadx=200)
+    voterListFrame.grid_rowconfigure(0, weight=1)
+    voterListFrame.grid_columnconfigure(0, weight=1)
+
     voterListCanvas = Canvas(voterListFrame)
-    voterListCanvas.pack(side=LEFT, fill=BOTH, expand=1)
-    scroll = ttk.Scrollbar(voterListFrame, orient=VERTICAL, command = voterListCanvas.yview)
-    scroll.pack(side=RIGHT, fill=Y)
+    voterListCanvas.grid(row=0, column=0, sticky=NSEW+W, ipady=130)
+    voterListCanvas.grid_rowconfigure(0, weight=1)
+    voterListCanvas.grid_columnconfigure(0, weight=1)
+
+    scroll = ttk.Scrollbar(voterListFrame, orient=VERTICAL, command= voterListCanvas.yview)
+    scroll.grid(sticky=NS+E, column=1, row=0)
 
     voterListCanvas.configure(yscrollcommand=scroll.set)
     voterListCanvas.bind("<Configure>", lambda e: voterListCanvas.configure(scrollregion=voterListCanvas.bbox("all")))
@@ -51,12 +57,13 @@ def showVoterList():
     canvasFrame = ttk.Frame(voterListCanvas)
     voterListCanvas.create_window((0,0), window=canvasFrame, anchor=NW)
     voterListData = fetchVotersBIN()
-
-    backButton.pack(padx=(7,0), pady=(0,7), anchor=NW, side=TOP)
+    backButton.grid(padx=(7,0), columnspan=2)
+    # backButton.pack(padx=(7,0), pady=(0,7), anchor=NW, side=TOP)
     
     for i in range(len(voterListData)):
-        Label(canvasFrame, text=f"ID: {voterListData[i]['ID']},{' '*10}", font="mont").grid(row=i+1, column=0, sticky=W)
-        Label(canvasFrame, text=f"Name: {voterListData[i]['Name']}", font="mont").grid(row=i+1, column=1, sticky=W)
+        while True:
+            Label(canvasFrame, text=f"ID: {voterListData[i]['ID']},{' '*10}", font="mont").grid(row=i+1, column=0, sticky=W)
+            Label(canvasFrame, text=f"Name: {voterListData[i]['Name']}", font="mont").grid(row=i+1, column=1, sticky=W)
 
 def openDebugWin():
     global btnstyle
