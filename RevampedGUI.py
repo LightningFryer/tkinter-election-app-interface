@@ -36,20 +36,10 @@ def openAdminWin():
     adminSettingBtn.grid(row=3, column=0, padx=(130,0), pady=(10,10), columnspan=2)
     adminLogoutBtn.grid(row=4, column=0, padx=(130,0), pady=(10,10), columnspan=2)
 
-def openDebugWin():
-    global btnstyle
-    global debugWin
-    debugWin = Toplevel()
-    debugWin.title("Debug Operations")
-    consoleVoterListBtn = ttk.Button(debugWin, text="Voter List", command=display_voters_debug, style="my.TButton").grid(row=0, column=0, padx=15, ipadx=35, pady=15)
-    consoleCandidateListBtn = ttk.Button(debugWin, text="Candidate List", command=display_candidates_debug, style="my.TButton").grid(row=1, column=0, ipadx=30, pady=15)
-    autoLogin = ttk.Button(debugWin, text="Admin Login", command=openAdminWin, style="my.TButton").grid(row=2, column=0, padx=15, pady=15, ipadx=35,)
-    testList = ttk.Button(debugWin, text="Test List", command=testScroll, style="my.TButton").grid(row=3, column=0, padx=15, pady=15)
-
-def testScroll():
+def showVoterList():
     hideWidgetsOnScreen([nameLabel, nameEntry, passLabel, passEntry, loginbtn, loginErrorLabel])
     voterListFrame = ttk.Frame(root)
-    voterListFrame.pack(fill=BOTH, expand=1)
+    voterListFrame.pack(fill=BOTH, expand=1, padx=(200,0))
     voterListCanvas = Canvas(voterListFrame)
     voterListCanvas.pack(side=LEFT, fill=BOTH, expand=1)
     scroll = ttk.Scrollbar(voterListFrame, orient=VERTICAL, command = voterListCanvas.yview)
@@ -60,9 +50,41 @@ def testScroll():
 
     canvasFrame = ttk.Frame(voterListCanvas)
     voterListCanvas.create_window((0,0), window=canvasFrame, anchor=NW)
+    voterListData = fetchVotersBIN()
+
+    backButton.pack(padx=(7,0), pady=(0,7), anchor=NW, side=TOP)
     
-    # for i in range(50):
-    #     Label(canvasFrame, text=f"Line {i}. Sample Text for padding purposes", font="mont").pack()
+    for i in range(len(voterListData)):
+        Label(canvasFrame, text=f"ID: {voterListData[i]['ID']},{' '*10}", font="mont").grid(row=i+1, column=0, sticky=W)
+        Label(canvasFrame, text=f"Name: {voterListData[i]['Name']}", font="mont").grid(row=i+1, column=1, sticky=W)
+
+def openDebugWin():
+    global btnstyle
+    global debugWin
+    debugWin = Toplevel()
+    debugWin.title("Debug Operations")
+    consoleVoterListBtn = ttk.Button(debugWin, text="Voter List", command=showVoterList, style="my.TButton").grid(row=0, column=0, padx=15, ipadx=35, pady=15)
+    consoleCandidateListBtn = ttk.Button(debugWin, text="Candidate List", command=display_candidates_debug, style="my.TButton").grid(row=1, column=0, ipadx=30, pady=15)
+    autoLogin = ttk.Button(debugWin, text="Admin Login", command=openAdminWin, style="my.TButton").grid(row=2, column=0, padx=15, pady=15, ipadx=35,)
+    testList = ttk.Button(debugWin, text="Test List", command=showVoterList, style="my.TButton").grid(row=3, column=0, padx=15, pady=15)
+
+# def testScroll():
+#     hideWidgetsOnScreen([nameLabel, nameEntry, passLabel, passEntry, loginbtn, loginErrorLabel])
+#     voterListFrame = ttk.Frame(root)
+#     voterListFrame.pack(fill=BOTH, expand=1, pady=(0,100))
+#     voterListCanvas = Canvas(voterListFrame)
+#     voterListCanvas.pack(side=LEFT, fill=BOTH, expand=1)
+#     scroll = ttk.Scrollbar(voterListFrame, orient=VERTICAL, command = voterListCanvas.yview)
+#     scroll.pack(side=RIGHT, fill=Y)
+
+#     voterListCanvas.configure(yscrollcommand=scroll.set)
+#     voterListCanvas.bind("<Configure>", lambda e: voterListCanvas.configure(scrollregion=voterListCanvas.bbox("all")))
+
+#     canvasFrame = ttk.Frame(voterListCanvas)
+#     voterListCanvas.create_window((0,0), window=canvasFrame, anchor=NW)
+    
+#     for i in range(1,51):
+#         Label(canvasFrame, text=f"Line {i}. Sample Text for padding purposes", font="mont").pack()
 
 
 def submitOnClick(event = None):
@@ -148,6 +170,7 @@ loginErrorLabel = ttk.Label(root, font="mont", text="Sorry but it seems like\nyo
 addAdminProfile = ttk.Button(root, text="Create a new Admin Profile", style="my.TButton")
 delAdminProfile = ttk.Button(root, text="Delete an Admin Profile   ", style="my.TButton")
 updateAdminProfile = ttk.Button(root, text="Update an Admin Profile", style="my.TButton")
+
 backButton = ttk.Button(root, text="< Back", style="my.TButton", command=goBack)
 
 #admin Settings
