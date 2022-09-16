@@ -27,10 +27,9 @@ candData = StringVar()
 def openAdminWin():
     hidePanel(mainFrame)
     showPanel(adminFrame)
-    root.update()
 
 def showVoterList():
-    hidePanel(mainFrame)
+    hidePanel(voterConfigFrame)
     global voterListFrame
     voterListFrame = ttk.Frame(root)
     voterListFrame.grid(row=0, column=0, sticky=NSEW, ipadx=200)
@@ -52,7 +51,8 @@ def showVoterList():
     voterListCanvas.create_window((0,0), window=canvasFrame, anchor=NW)
     global voterListData
     voterListData = fetchVotersBIN()
-    fromVoterConfigBtn.grid(row=1, padx=(7,0), columnspan=2, pady=(15,0))
+    fromVoterListBtn = ttk.Button(voterListFrame, text="< Back", style="my.TButton", command=fromVoterList)
+    fromVoterListBtn.grid(row=1, padx=(7,0), columnspan=2, pady=(15,0))
     
     for i in range(len(voterListData)):
         Label(canvasFrame, text=f"ID: {voterListData[i]['ID']}", font="mont").grid(row=i+1, column=0, sticky=W, padx=(180,100))
@@ -106,10 +106,7 @@ def submitOnClick(event = None):
         loginErrorLabel.grid_remove()
         openAdminWin()
     else:
-        loginErrorLabel.grid()
-
-
-# root.bind("<Return>", submitOnClick)
+        loginErrorLabel.grid(row=3, column=0, columnspan=2, padx=(95,0), pady=(30,0))
 
 def showPanel(frameName):
     frameName.grid()
@@ -121,13 +118,21 @@ def openAdminSettings():
     hidePanel(adminFrame)
     showPanel(adminSettingsFrame)
 
+def openVoterConfig():
+    hidePanel(adminFrame)
+    showPanel(voterConfigFrame)
+
 def goBack():
     hidePanel(adminSettingsFrame)
     openAdminWin()
 
 def fromVoterConfig():
-    hidePanel(voterListFrame)
+    hidePanel(voterConfigFrame)
     openAdminWin()
+
+def fromVoterList():
+    hidePanel(voterListFrame)
+    showPanel(voterConfigFrame)
 
 def adminLogout():
     hidePanel(adminFrame)
@@ -167,7 +172,7 @@ mainFrame.grid_forget()
 adminFrame = ttk.Frame(root)
 adminFrame.grid(row=0, column=0)
 adminWinLabel = ttk.Label(adminFrame, text="Welcome Admin", font="mont")
-voterOpBtn = ttk.Button(adminFrame, text="Configure Voters' List", style="my.TButton")
+voterOpBtn = ttk.Button(adminFrame, text="Configure Voters' List", style="my.TButton", command=openVoterConfig)
 candidateOpBtn = ttk.Button(adminFrame, text="Configure Candidates' List", style="my.TButton")
 setVoteSessionBtn = ttk.Button(adminFrame, text="Setup Voting Session", style="my.TButton")
 startVoterSessionBtn = ttk.Button(adminFrame, text="Start a Voting Session", style="my.TButton", padding=(25,3,25,3))
@@ -191,7 +196,6 @@ addAdminProfile = ttk.Button(adminSettingsFrame, text="Create a new Admin Profil
 delAdminProfile = ttk.Button(adminSettingsFrame, text="Delete an Admin Profile   ", style="my.TButton")
 updateAdminProfile = ttk.Button(adminSettingsFrame, text="Update an Admin Profile", style="my.TButton")
 backButton = ttk.Button(adminSettingsFrame, text="< Back", style="my.TButton", command=goBack)
-fromVoterConfigBtn = ttk.Button(adminSettingsFrame, text="< Back", style="my.TButton", command=fromVoterConfig)
 
 addAdminProfile.grid(row=1, column=0, padx=(150,5), pady=(200,15))
 delAdminProfile.grid(row=1, column=1, padx=(5,60), pady=(200,15))
@@ -200,7 +204,22 @@ backButton.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
 adminSettingsFrame.grid_forget()
 
-root.grid_propagate(False)
+#Admin Voter Config Panel
+voterConfigFrame = ttk.Frame(root)
+addAVoterRecord = ttk.Button(voterConfigFrame, text="Add a new voter record", style="my.TButton")
+delAVoterRecord = ttk.Button(voterConfigFrame, text="Delete a voter record", style="my.TButton")
+displayVoters = ttk.Button(voterConfigFrame, text="Display Voter List", style="my.TButton", command=showVoterList)
+fromVoterConfigBtn = ttk.Button(voterConfigFrame, text="< Back", style="my.TButton", command=fromVoterConfig)
+
+addAVoterRecord.grid(row=1, column=0, padx=(150,5), pady=(200,15), ipadx=20)
+delAVoterRecord.grid(row=1, column=1, padx=(5,60), pady=(200,15), ipadx=25)
+displayVoters.grid(row=2, column=0, columnspan=2, padx=(100,0), ipadx=25)
+fromVoterConfigBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
+
+voterConfigFrame.grid_forget()
+
 openDebugWin()
 showPanel(mainFrame)
+root.grid_propagate(False)
+root.bind("<Return>", submitOnClick)
 root.mainloop()
