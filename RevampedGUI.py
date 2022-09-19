@@ -1,4 +1,3 @@
-from textwrap import fill
 from tkinter import *
 from tkinter import ttk
 from helper import *
@@ -110,7 +109,7 @@ def submitOnClick(event = None):
         loginErrorLabel.grid(row=3, column=0, columnspan=2, padx=(95,0), pady=(30,0))
 
 def showPanel(frameName):
-    frameName.pack(fill=BOTH, expand=True)
+    frameName.pack(fill=BOTH, expand=True, padx=10, pady=10)
 
 def hidePanel(frameName):
     frameName.pack_forget()
@@ -152,8 +151,7 @@ def adminLogout():
 #         print("Aborting...")
 
 #main window widgets
-mainFrame = ttk.Frame(root)
-mainFrame.pack(fill=BOTH, expand=True)
+mainFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 nameLabel = ttk.Label(mainFrame, text="Enter your name:", font="mont")
 nameEntry = ttk.Entry(mainFrame, font="mont", textvariable=nameData)
 passLabel = ttk.Label(mainFrame, text="Enter your Password:", font="mont")
@@ -171,7 +169,6 @@ mainFrame.pack_forget()
 
 #admin Main Window
 adminFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
-# adminFrame.pack(fill=BOTH, expand=True)
 adminWinLabel = ttk.Label(adminFrame, text="Welcome Admin", font="mont")
 adminLabelSep = ttk.Separator(adminFrame)
 voterOpBtn = ttk.Button(adminFrame, text="Configure Voters' List", style="my.TButton", command=openVoterConfig)
@@ -193,8 +190,7 @@ adminLogoutBtn.grid(row=5, column=0, padx=(130,0), pady=(10,10), columnspan=2)
 adminFrame.pack_forget()
 
 #admin Settings Window
-adminSettingsFrame = ttk.Frame(root)
-adminSettingsFrame.pack(fill=BOTH, expand=True)
+adminSettingsFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 adminSetttingLabel = ttk.Label(adminSettingsFrame, text="Admin Settings", font="mont")
 adminSetttingLabelSep = ttk.Separator(adminSettingsFrame)
 addAdminProfile = ttk.Button(adminSettingsFrame, text="Create a new Admin Profile", style="my.TButton")
@@ -202,18 +198,17 @@ delAdminProfile = ttk.Button(adminSettingsFrame, text="Delete an Admin Profile  
 updateAdminProfile = ttk.Button(adminSettingsFrame, text="Update an Admin Profile", style="my.TButton")
 backButton = ttk.Button(adminSettingsFrame, text="< Back", style="my.TButton", command=goBack)
 
-adminSetttingLabel.grid(row=1, column=0, columnspan=2, pady=(150,15), padx=(100,0))
-adminSetttingLabelSep.grid(row=2, column=0, columnspan=2, padx=(120,0), pady=(0,10), ipady=2, sticky=EW)
+adminSetttingLabel.grid(row=1, column=0, columnspan=2, pady=(150,15), padx=(150,0))
+adminSetttingLabelSep.grid(row=2, column=0, columnspan=2, padx=(150,0), pady=(0,10), ipady=2, sticky=EW)
 addAdminProfile.grid(row=3, column=0, padx=(150,5))
-delAdminProfile.grid(row=3, column=1, padx=(5,60))
-updateAdminProfile.grid(row=4, column=0, columnspan=2, padx=(100,0), pady=(15,0))
+delAdminProfile.grid(row=3, column=1, padx=(5,0), ipadx=10)
+updateAdminProfile.grid(row=4, column=0, columnspan=2, padx=(125,0), pady=(15,0))
 backButton.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
 adminSettingsFrame.pack_forget()
 
 #Admin Voter Config Panel
-voterConfigFrame = ttk.Frame(root)
-voterConfigFrame.pack(fill=BOTH, expand=True)
+voterConfigFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 addAVoterRecord = ttk.Button(voterConfigFrame, text="Add a new voter record", style="my.TButton")
 delAVoterRecord = ttk.Button(voterConfigFrame, text="Delete a voter record", style="my.TButton")
 displayVoters = ttk.Button(voterConfigFrame, text="Display Voter List", style="my.TButton", command=showVoterList)
@@ -228,8 +223,5 @@ voterConfigFrame.pack_forget()
 
 openDebugWin()
 showPanel(mainFrame)
-# # root.pack_propagate(False)
-# root.rowconfigure(0, weight=1)
-# root.columnconfigure(0, weight=1)
 root.bind("<Return>", submitOnClick)
 root.mainloop()
