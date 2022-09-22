@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from turtle import st
 from helper import *
 from eAuth import *
 from modify import *
@@ -21,11 +22,18 @@ btnstyle = ttk.Style().configure("my.TButton", font=("mont",))
 radioStyle = ttk.Style().configure("my.TRadiobutton", font=("mont",))
 #Label fram style
 framestyle = ttk.Style().configure("my.TLabelframe", font=("mont",))
+#Option Menu Style
+opmenustyle = ttk.Style().configure("my.TOptionMenu", font=("mont",))
 
 #textvariable data of buttons is stored here        
+genders = ["Male", "Male", "Female", "Other"]
 nameData = StringVar()
 uidData = StringVar()
 candData = StringVar()
+voterNameData = StringVar()
+voterAgeData = IntVar()
+genderData = StringVar()
+genderData.set(genders[0])
 
 def showVoterList():
     hidePanel(voterConfigFrame)
@@ -51,8 +59,10 @@ def showVoterList():
     voterListData = fetchVotersBIN()
     
     fromVoterListBtn = ttk.Button(ListFrame, text="< Back", style="my.TButton", command=fromVoterList)
-    fromVoterListBtn.grid(row=1, padx=(7,0), columnspan=2, pady=(15,0))
-    
+    fromVoterListBtn.grid(row=2, padx=(7,0), columnspan=2, pady=(15,0))
+    voterListSep = ttk.Separator(ListFrame)
+    voterListSep.grid(row=1, columnspan=2, sticky=EW, ipady=2)
+
     for i in range(len(voterListData)):
         Label(canvasFrame, text=f"ID: {voterListData[i]['ID']}", font="mont").grid(row=i+1, column=0, sticky=W, padx=(180,100))
         Label(canvasFrame, text=f"Name: {voterListData[i]['Name']}", font="mont").grid(row=i+1, column=1, sticky=W)
@@ -79,6 +89,11 @@ def showCandList():
     canvasFrame = ttk.Frame(ListCanvas)
     ListCanvas.create_window((0,0), window=canvasFrame, anchor=NW)
     candListData = fetchCandidates()
+
+    fromCandListBtn = ttk.Button(ListFrame, text="< Back", style="my.TButton", command=fromCandList)
+    candListSep = ttk.Separator(ListFrame)
+    fromCandListBtn.grid(row=2, padx=(7,0), columnspan=2, pady=(15,0))
+    candListSep.grid(row=1, columnspan=2, sticky=EW, ipady=2)
 
     for i in range(1,len(candListData)):
         Label(canvasFrame, text=f"ID: {candListData[i][0]}   Name: {candListData[i][1]}   Age: {candListData[i][2]}   Sex: {candListData[i][3]}   Symbol: {candListData[i][4]}", font="mont").grid(row=i+1, column=0, sticky=W)
@@ -119,7 +134,11 @@ def showPanel(frameName):
     frameName.pack(fill=BOTH, expand=True, padx=10, pady=10)
 
 def hidePanel(frameName):
-    frameName.pack_forget()
+    try:
+        frameName.pack_forget()
+        frameName.grid_forget()
+    except:
+        pass
 
 def openAdminWin():
     hidePanel(mainFrame)
@@ -130,15 +149,19 @@ def openCandWin():
     hidePanel(adminFrame)
     showPanel(candConfigFrame)
 
-def openAdminSettings():
+def openAdminSettingsWin():
     crntPanel = "adminSettings"
     hidePanel(adminFrame)
     showPanel(adminSettingsFrame)
 
-def openVoterConfig():
+def openVoterConfigWin():
     crntPanel = "voterConfig"
     hidePanel(adminFrame)
     showPanel(voterConfigFrame)
+
+def openVoterAddWin():
+    hidePanel(voterConfigFrame)
+    showPanel(voterAddFrame)
 
 def fromAdminSettings():
     hidePanel(adminSettingsFrame)
@@ -155,6 +178,14 @@ def fromCandConfig():
 def fromVoterList():
     hidePanel(ListFrame)
     showPanel(voterConfigFrame)
+
+def fromAddVoter():
+    hidePanel(voterAddFrame)
+    showPanel(voterConfigFrame)
+
+def fromCandList():
+    hidePanel(ListFrame)
+    showPanel(candConfigFrame)
 
 def adminLogout():
     hidePanel(adminFrame)
@@ -175,7 +206,7 @@ def adminLogout():
 #main window widgets
 mainFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 nameLabel = ttk.Label(mainFrame, text="Enter your name:", font="mont")
-nameEntry = ttk.Entry(mainFrame, font="mont", textvariable=nameData)
+nameEntry = ttk.Entry(mainFrame, font="mont",textvariable=nameData)
 passLabel = ttk.Label(mainFrame, text="Enter your Password:", font="mont")
 passEntry = ttk.Entry(mainFrame, font="mont", textvariable=uidData, show="*")
 loginbtn = ttk.Button(mainFrame, text="Login",command=submitOnClick, style="my.TButton")
@@ -193,11 +224,11 @@ mainFrame.pack_forget()
 adminFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 adminWinLabel = ttk.Label(adminFrame, text="Welcome Admin", font="mont")
 adminLabelSep = ttk.Separator(adminFrame)
-voterOpBtn = ttk.Button(adminFrame, text="Configure Voters' List", style="my.TButton", command=openVoterConfig)
+voterOpBtn = ttk.Button(adminFrame, text="Configure Voters' List", style="my.TButton", command=openVoterConfigWin)
 candidateOpBtn = ttk.Button(adminFrame, text="Configure Candidates' List", style="my.TButton", command=openCandWin)
 setVoteSessionBtn = ttk.Button(adminFrame, text="Setup Voting Session", style="my.TButton")
 startVoterSessionBtn = ttk.Button(adminFrame, text="Start a Voting Session", style="my.TButton", padding=(25,3,25,3))
-adminSettingBtn = ttk.Button(adminFrame, text="Admin Settings", style="my.TButton", command=openAdminSettings)
+adminSettingBtn = ttk.Button(adminFrame, text="Admin Settings", style="my.TButton", command=openAdminSettingsWin)
 adminLogoutBtn = ttk.Button(adminFrame, text="Logout", style="my.TButton", padding=(20,3,20,3), command=adminLogout)
 
 adminWinLabel.grid(row=0, column=0, columnspan=2, pady=(170,5), padx=(150,0))
@@ -233,7 +264,7 @@ adminSettingsFrame.pack_forget()
 voterConfigFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 voterConfigLabel = ttk.Label(voterConfigFrame, text="Voter Configuration", font="mont")
 voterConfigLabelSep = ttk.Separator(voterConfigFrame)
-addAVoterRecord = ttk.Button(voterConfigFrame, text="Add a new voter record", style="my.TButton")
+addAVoterRecord = ttk.Button(voterConfigFrame, text="Add a new voter record", style="my.TButton", command=openVoterAddWin)
 delAVoterRecord = ttk.Button(voterConfigFrame, text="Delete a voter record", style="my.TButton")
 displayVoters = ttk.Button(voterConfigFrame, text="Display Voter List", style="my.TButton", command=showVoterList)
 fromVoterConfigBtn = ttk.Button(voterConfigFrame, text="< Back", style="my.TButton", command=fromVoterConfig)
@@ -246,6 +277,26 @@ displayVoters.grid(row=4, column=0, columnspan=2, padx=(100,0), ipadx=25)
 fromVoterConfigBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
 voterConfigFrame.pack_forget()
+
+#Add Voter Win
+voterAddFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
+voterNameAddLabel = ttk.Label(voterAddFrame, text="Enter voter Name:", font="mont")
+voterAgeAddLabel = ttk.Label(voterAddFrame, text="Enter voter Age:", font="mont")
+voterAgeAddEntry = ttk.Entry(voterAddFrame, font="mont", textvariable=voterAgeData)
+voterNameAddEntry = ttk.Entry(voterAddFrame, font="mont", textvariable=voterNameData)
+voterChooseGenderMenu = ttk.OptionMenu(voterAddFrame, genderData, *genders, style="my.TOptionMenu")
+voterChooseGenderLabel = ttk.Label(voterAddFrame, text="Choose Voter Gender", font="mont")
+fromAddVoterBtn = ttk.Button(voterAddFrame, text="< Back", style="my.TButton", command=fromAddVoter)
+
+fromAddVoterBtn.grid(row=0, column=0, padx=(7,0), pady=(7,0))
+voterNameAddLabel.grid(row=1, column=0, sticky=W)
+voterNameAddEntry.grid(row=1, column=1)
+voterAgeAddLabel.grid(row=2, column=0, sticky=W)
+voterAgeAddEntry.grid(row=2, column=1)
+voterChooseGenderLabel.grid(row=3, column=0)
+voterChooseGenderMenu.grid(row=3, column=1)
+
+voterAddFrame.pack_forget()
 
 #Admin Candidate Config Panel
 candConfigFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
