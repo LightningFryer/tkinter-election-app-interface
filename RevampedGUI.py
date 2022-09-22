@@ -13,50 +13,75 @@ theme.set_theme("dark")
 root.geometry("800x600")
 root.resizable(0,0)
 
+crntPanel = ""
+
 #btn style
 btnstyle = ttk.Style().configure("my.TButton", font=("mont",))
-
 #radiobtn style
 radioStyle = ttk.Style().configure("my.TRadiobutton", font=("mont",))
+#Label fram style
+framestyle = ttk.Style().configure("my.TLabelframe", font=("mont",))
 
 #textvariable data of buttons is stored here        
 nameData = StringVar()
 uidData = StringVar()
 candData = StringVar()
 
-def openAdminWin():
-    hidePanel(mainFrame)
-    showPanel(adminFrame)
-
 def showVoterList():
     hidePanel(voterConfigFrame)
-    global voterListFrame
-    voterListFrame = ttk.Frame(root)
-    voterListFrame.grid(row=0, column=0, sticky=NSEW, ipadx=200)
-    voterListFrame.grid_rowconfigure(0, weight=1)
-    voterListFrame.grid_columnconfigure(0, weight=1)
+    global ListFrame, voterListData
+    ListFrame = ttk.Frame(root)
+    ListFrame.grid(row=0, column=0, sticky=NSEW, ipadx=200)
+    ListFrame.grid_rowconfigure(0, weight=1)
+    ListFrame.grid_columnconfigure(0, weight=1)
 
-    voterListCanvas = Canvas(voterListFrame)
-    voterListCanvas.grid(row=0, column=0, sticky=NSEW+W, ipady=130)
-    voterListCanvas.grid_rowconfigure(0, weight=1)
-    voterListCanvas.grid_columnconfigure(0, weight=1)
+    ListCanvas = Canvas(ListFrame)
+    ListCanvas.grid(row=0, column=0, sticky=NSEW+W, ipady=130)
+    ListCanvas.grid_rowconfigure(0, weight=1)
+    ListCanvas.grid_columnconfigure(0, weight=1)
 
-    scroll = ttk.Scrollbar(voterListFrame, orient=VERTICAL, command= voterListCanvas.yview)
+    scroll = ttk.Scrollbar(ListFrame, orient=VERTICAL, command= ListCanvas.yview)
     scroll.grid(sticky=NS+E, column=1, row=0)
 
-    voterListCanvas.configure(yscrollcommand=scroll.set)
-    voterListCanvas.bind("<Configure>", lambda e: voterListCanvas.configure(scrollregion=voterListCanvas.bbox("all")))
+    ListCanvas.configure(yscrollcommand=scroll.set)
+    ListCanvas.bind("<Configure>", lambda e: ListCanvas.configure(scrollregion=ListCanvas.bbox("all")))
 
-    canvasFrame = ttk.Frame(voterListCanvas)
-    voterListCanvas.create_window((0,0), window=canvasFrame, anchor=NW)
-    global voterListData
+    canvasFrame = ttk.Frame(ListCanvas)
+    ListCanvas.create_window((0,0), window=canvasFrame, anchor=NW)
     voterListData = fetchVotersBIN()
-    fromVoterListBtn = ttk.Button(voterListFrame, text="< Back", style="my.TButton", command=fromVoterList)
+    
+    fromVoterListBtn = ttk.Button(ListFrame, text="< Back", style="my.TButton", command=fromVoterList)
     fromVoterListBtn.grid(row=1, padx=(7,0), columnspan=2, pady=(15,0))
     
     for i in range(len(voterListData)):
         Label(canvasFrame, text=f"ID: {voterListData[i]['ID']}", font="mont").grid(row=i+1, column=0, sticky=W, padx=(180,100))
         Label(canvasFrame, text=f"Name: {voterListData[i]['Name']}", font="mont").grid(row=i+1, column=1, sticky=W)
+
+def showCandList():
+    hidePanel(candConfigFrame)
+    global ListFrame, candListData
+    ListFrame = ttk.Frame(root)
+    ListFrame.grid(row=0, column=0, sticky=NSEW, ipadx=200)
+    ListFrame.grid_rowconfigure(0, weight=1)
+    ListFrame.grid_columnconfigure(0, weight=1)
+
+    ListCanvas = Canvas(ListFrame)
+    ListCanvas.grid(row=0, column=0, sticky=NSEW+W, ipady=130)
+    ListCanvas.grid_rowconfigure(0, weight=1)
+    ListCanvas.grid_columnconfigure(0, weight=1)
+
+    scroll = ttk.Scrollbar(ListFrame, orient=VERTICAL, command= ListCanvas.yview)
+    scroll.grid(sticky=NS+E, column=1, row=0)
+
+    ListCanvas.configure(yscrollcommand=scroll.set)
+    ListCanvas.bind("<Configure>", lambda e: ListCanvas.configure(scrollregion=ListCanvas.bbox("all")))
+
+    canvasFrame = ttk.Frame(ListCanvas)
+    ListCanvas.create_window((0,0), window=canvasFrame, anchor=NW)
+    candListData = fetchCandidates()
+
+    for i in range(1,len(candListData)):
+        Label(canvasFrame, text=f"ID: {candListData[i][0]}   Name: {candListData[i][1]}   Age: {candListData[i][2]}   Sex: {candListData[i][3]}   Symbol: {candListData[i][4]}", font="mont").grid(row=i+1, column=0, sticky=W)
 
 def openDebugWin():
     global btnstyle
@@ -67,24 +92,6 @@ def openDebugWin():
     consoleCandidateListBtn = ttk.Button(debugWin, text="Candidate List", command=display_candidates_debug, style="my.TButton").grid(row=1, column=0, ipadx=30, pady=15)
     autoLogin = ttk.Button(debugWin, text="Admin Login", command=openAdminWin, style="my.TButton").grid(row=2, column=0, padx=15, pady=15, ipadx=35,)
     testList = ttk.Button(debugWin, text="Test List", command=showVoterList, style="my.TButton").grid(row=3, column=0, padx=15, pady=15)
-
-# def testScroll():
-#     hideWidgetsOnScreen([nameLabel, nameEntry, passLabel, passEntry, loginbtn, loginErrorLabel])
-#     voterListFrame = ttk.Frame(root)
-#     voterListFrame.pack(fill=BOTH, expand=1, pady=(0,100))
-#     voterListCanvas = Canvas(voterListFrame)
-#     voterListCanvas.pack(side=LEFT, fill=BOTH, expand=1)
-#     scroll = ttk.Scrollbar(voterListFrame, orient=VERTICAL, command = voterListCanvas.yview)
-#     scroll.pack(side=RIGHT, fill=Y)
-
-#     voterListCanvas.configure(yscrollcommand=scroll.set)
-#     voterListCanvas.bind("<Configure>", lambda e: voterListCanvas.configure(scrollregion=voterListCanvas.bbox("all")))
-
-#     canvasFrame = ttk.Frame(voterListCanvas)
-#     voterListCanvas.create_window((0,0), window=canvasFrame, anchor=NW)
-    
-#     for i in range(1,51):
-#         Label(canvasFrame, text=f"Line {i}. Sample Text for padding purposes", font="mont").pack()
 
 
 def submitOnClick(event = None):
@@ -114,15 +121,26 @@ def showPanel(frameName):
 def hidePanel(frameName):
     frameName.pack_forget()
 
+def openAdminWin():
+    hidePanel(mainFrame)
+    showPanel(adminFrame)
+    crntPanel = "adminWin"
+
+def openCandWin():
+    hidePanel(adminFrame)
+    showPanel(candConfigFrame)
+
 def openAdminSettings():
+    crntPanel = "adminSettings"
     hidePanel(adminFrame)
     showPanel(adminSettingsFrame)
 
 def openVoterConfig():
+    crntPanel = "voterConfig"
     hidePanel(adminFrame)
     showPanel(voterConfigFrame)
 
-def goBack():
+def fromAdminSettings():
     hidePanel(adminSettingsFrame)
     openAdminWin()
 
@@ -130,8 +148,12 @@ def fromVoterConfig():
     hidePanel(voterConfigFrame)
     openAdminWin()
 
+def fromCandConfig():
+    hidePanel(candConfigFrame)
+    openAdminWin()
+
 def fromVoterList():
-    hidePanel(voterListFrame)
+    hidePanel(ListFrame)
     showPanel(voterConfigFrame)
 
 def adminLogout():
@@ -172,7 +194,7 @@ adminFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 adminWinLabel = ttk.Label(adminFrame, text="Welcome Admin", font="mont")
 adminLabelSep = ttk.Separator(adminFrame)
 voterOpBtn = ttk.Button(adminFrame, text="Configure Voters' List", style="my.TButton", command=openVoterConfig)
-candidateOpBtn = ttk.Button(adminFrame, text="Configure Candidates' List", style="my.TButton")
+candidateOpBtn = ttk.Button(adminFrame, text="Configure Candidates' List", style="my.TButton", command=openCandWin)
 setVoteSessionBtn = ttk.Button(adminFrame, text="Setup Voting Session", style="my.TButton")
 startVoterSessionBtn = ttk.Button(adminFrame, text="Start a Voting Session", style="my.TButton", padding=(25,3,25,3))
 adminSettingBtn = ttk.Button(adminFrame, text="Admin Settings", style="my.TButton", command=openAdminSettings)
@@ -196,7 +218,7 @@ adminSetttingLabelSep = ttk.Separator(adminSettingsFrame)
 addAdminProfile = ttk.Button(adminSettingsFrame, text="Create a new Admin Profile", style="my.TButton")
 delAdminProfile = ttk.Button(adminSettingsFrame, text="Delete an Admin Profile   ", style="my.TButton")
 updateAdminProfile = ttk.Button(adminSettingsFrame, text="Update an Admin Profile", style="my.TButton")
-backButton = ttk.Button(adminSettingsFrame, text="< Back", style="my.TButton", command=goBack)
+backButton = ttk.Button(adminSettingsFrame, text="< Back", style="my.TButton", command=fromAdminSettings)
 
 adminSetttingLabel.grid(row=1, column=0, columnspan=2, pady=(150,15), padx=(150,0))
 adminSetttingLabelSep.grid(row=2, column=0, columnspan=2, padx=(150,0), pady=(0,10), ipady=2, sticky=EW)
@@ -209,17 +231,39 @@ adminSettingsFrame.pack_forget()
 
 #Admin Voter Config Panel
 voterConfigFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
+voterConfigLabel = ttk.Label(voterConfigFrame, text="Voter Configuration", font="mont")
+voterConfigLabelSep = ttk.Separator(voterConfigFrame)
 addAVoterRecord = ttk.Button(voterConfigFrame, text="Add a new voter record", style="my.TButton")
 delAVoterRecord = ttk.Button(voterConfigFrame, text="Delete a voter record", style="my.TButton")
 displayVoters = ttk.Button(voterConfigFrame, text="Display Voter List", style="my.TButton", command=showVoterList)
 fromVoterConfigBtn = ttk.Button(voterConfigFrame, text="< Back", style="my.TButton", command=fromVoterConfig)
 
-addAVoterRecord.grid(row=1, column=0, padx=(150,5), pady=(200,15), ipadx=20)
-delAVoterRecord.grid(row=1, column=1, padx=(5,60), pady=(200,15), ipadx=25)
-displayVoters.grid(row=2, column=0, columnspan=2, padx=(100,0), ipadx=25)
+voterConfigLabel.grid(row=1, column=0, columnspan=2, pady=(170,0), padx=(150,0))
+voterConfigLabelSep.grid(row=2, column=0, ipady=2, sticky=EW, columnspan=2, padx=(130,0), pady=(10,10))
+addAVoterRecord.grid(row=3, column=0, padx=(130,5), ipadx=20, pady=(0,10))
+delAVoterRecord.grid(row=3, column=1, padx=(5,0), ipadx=25, pady=(0,10))
+displayVoters.grid(row=4, column=0, columnspan=2, padx=(100,0), ipadx=25)
 fromVoterConfigBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
 voterConfigFrame.pack_forget()
+
+#Admin Candidate Config Panel
+candConfigFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
+candConfigLabel = ttk.Label(candConfigFrame, text="Candidate Configuration", font="mont")
+candConfigLabelSep = ttk.Separator(candConfigFrame)
+addACandRecord = ttk.Button(candConfigFrame, text="Add a new Candidate record", style="my.TButton")
+delACandRecord = ttk.Button(candConfigFrame, text="Delete a Candidate record", style="my.TButton")
+displayCand = ttk.Button(candConfigFrame, text="Display Candidate List", style="my.TButton", command=showCandList)
+fromCandConfigBtn = ttk.Button(candConfigFrame, text="< Back", style="my.TButton", command=fromCandConfig)
+
+candConfigLabel.grid(row=1, column=0, columnspan=2, pady=(170,0), padx=(110,0))
+candConfigLabelSep.grid(row=2, column=0, ipady=2, sticky=EW, columnspan=2, padx=(90,0), pady=(10,10))
+addACandRecord.grid(row=3, column=0, padx=(90,5), ipadx=20, pady=(0,10))
+delACandRecord.grid(row=3, column=1, padx=(5,0), ipadx=25, pady=(0,10))
+displayCand.grid(row=4, column=0, columnspan=2, padx=(90,0), ipadx=25)
+fromCandConfigBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
+
+candConfigFrame.pack_forget()
 
 openDebugWin()
 showPanel(mainFrame)
