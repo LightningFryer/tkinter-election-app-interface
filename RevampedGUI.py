@@ -1,6 +1,9 @@
+from email import message
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 from turtle import st
+from unicodedata import name
 from helper import *
 from eAuth import *
 from modify import *
@@ -31,7 +34,7 @@ nameData = StringVar()
 uidData = StringVar()
 candData = StringVar()
 voterNameData = StringVar()
-voterAgeData = IntVar()
+voterAgeData = StringVar()
 genderData = StringVar()
 genderData.set(genders[0])
 
@@ -108,18 +111,15 @@ def openDebugWin():
     autoLogin = ttk.Button(debugWin, text="Admin Login", command=openAdminWin, style="my.TButton").grid(row=2, column=0, padx=15, pady=15, ipadx=35,)
     testList = ttk.Button(debugWin, text="Test List", command=showVoterList, style="my.TButton").grid(row=3, column=0, padx=15, pady=15)
 
-
+#Submit Button Commands
 def submitOnClick(event = None):
-    global getName
-    getName = nameData.get()
-    getUID = uidData.get()
     loginErrorLabel.grid_remove()
     adminListDAT = open("Data/cred.dat", "rb")
     found = 0
     try:
         while True:
             dataAdmin = pickle.load(adminListDAT)
-            if getName == caesarCipher.caesarDecrypt(dataAdmin["Admin Name"]) and getUID == caesarCipher.caesarDecrypt(dataAdmin["Password"]):
+            if nameData.get() == caesarCipher.caesarDecrypt(dataAdmin["Admin Name"]) and uidData.get() == caesarCipher.caesarDecrypt(dataAdmin["Password"]):
                 found = 1
                 break
     except EOFError:
@@ -130,6 +130,19 @@ def submitOnClick(event = None):
     else:
         loginErrorLabel.grid(row=3, column=0, columnspan=2, padx=(95,0), pady=(30,0))
 
+def voterAddSubmit(event = None):
+    UUIDgen = str(uuid.uuid4()).split("-")[0]
+    response = messagebox.askyesno(title="Are you sure?", message="Do you want to add Voter's details to Databse?")
+    if response == 1:
+        with open("Data/voterList.csv", "a") as f:
+            writer = csv.writer(f)
+            writer.writerow([voterNameData.get(), voterAgeData.get(), int(genderData.get())])
+
+        with open("Data/voterList.dat", "ab") as f:
+            pickle.dump({"ID":UUIDgen, "Name":voterNameData.get()}, f)
+        messagebox.showinfo(title="Success!", message="Successfully added details of Voter to Database!")
+    
+#Show/Hide Panel Commands
 def showPanel(frameName):
     frameName.pack(fill=BOTH, expand=True, padx=10, pady=10)
 
@@ -140,6 +153,7 @@ def hidePanel(frameName):
     except:
         pass
 
+#Open Window Commands
 def openAdminWin():
     hidePanel(mainFrame)
     showPanel(adminFrame)
@@ -163,6 +177,7 @@ def openVoterAddWin():
     hidePanel(voterConfigFrame)
     showPanel(voterAddFrame)
 
+#Close/Hide Windows
 def fromAdminSettings():
     hidePanel(adminSettingsFrame)
     openAdminWin()
@@ -283,18 +298,21 @@ voterAddFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 voterNameAddLabel = ttk.Label(voterAddFrame, text="Enter voter Name:", font="mont")
 voterAgeAddLabel = ttk.Label(voterAddFrame, text="Enter voter Age:", font="mont")
 voterAgeAddEntry = ttk.Entry(voterAddFrame, font="mont", textvariable=voterAgeData)
+voterAgeAddEntry.insert(0,"")
 voterNameAddEntry = ttk.Entry(voterAddFrame, font="mont", textvariable=voterNameData)
 voterChooseGenderMenu = ttk.OptionMenu(voterAddFrame, genderData, *genders, style="my.TOptionMenu")
 voterChooseGenderLabel = ttk.Label(voterAddFrame, text="Choose Voter Gender", font="mont")
+voterAddSubmitBtn = ttk.Button(voterAddFrame, text="Submit", style="my.TButton", command=voterAddSubmit)
 fromAddVoterBtn = ttk.Button(voterAddFrame, text="< Back", style="my.TButton", command=fromAddVoter)
 
-fromAddVoterBtn.grid(row=0, column=0, padx=(7,0), pady=(7,0))
-voterNameAddLabel.grid(row=1, column=0, sticky=W)
-voterNameAddEntry.grid(row=1, column=1)
-voterAgeAddLabel.grid(row=2, column=0, sticky=W)
-voterAgeAddEntry.grid(row=2, column=1)
-voterChooseGenderLabel.grid(row=3, column=0)
+fromAddVoterBtn.grid(row=0, column=0, padx=(7,0), pady=(7,0), sticky=NW)
+voterNameAddLabel.grid(row=1, column=0, sticky=W, padx=(175,0), pady=(175,10))
+voterNameAddEntry.grid(row=1, column=1, pady=(175,10))
+voterAgeAddLabel.grid(row=2, column=0, sticky=W, padx=(175,10))
+voterAgeAddEntry.grid(row=2, column=1, pady=(0,20))
+voterChooseGenderLabel.grid(row=3, column=0, sticky=W, padx=(175,0))
 voterChooseGenderMenu.grid(row=3, column=1)
+voterAddSubmitBtn.grid(row=4, column=0, columnspan=2, padx=(175,0), pady=(20,0), ipadx=15)
 
 voterAddFrame.pack_forget()
 
