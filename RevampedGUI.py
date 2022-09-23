@@ -26,14 +26,13 @@ framestyle = ttk.Style().configure("my.TLabelframe", font=("mont",))
 opmenustyle = ttk.Style().configure("my.TOptionMenu", font=("mont",))
 
 #textvariable data of buttons is stored here        
-genders = ["Male", "Male", "Female", "Other"]
 nameData = StringVar()
 uidData = StringVar()
 candData = StringVar()
 voterNameData = StringVar()
 voterAgeData = IntVar()
 genderData = StringVar()
-genderData.set(genders[0])
+genderData.set("Male")
 
 def showVoterList():
     hidePanel(voterConfigFrame)
@@ -131,7 +130,7 @@ def submitOnClick(event = None):
         loginErrorLabel.grid(row=3, column=0, columnspan=2, padx=(95,0), pady=(30,0))
 
 def showPanel(frameName):
-    frameName.pack(fill=BOTH, expand=True, padx=10, pady=10)
+    frameName.grid(sticky=NSEW, padx=10, pady=10)
 
 def hidePanel(frameName):
     try:
@@ -218,7 +217,7 @@ passLabel.grid(row=1, column=0, sticky=W, padx=(200,0), pady=(20,0))
 passEntry.grid(row=1, column=1, padx=(15,90), pady=(20,0))
 loginbtn.grid(row=2, column=0, columnspan=2, pady=(30,0), padx=(100,0), ipadx=40)
 
-mainFrame.pack_forget()
+mainFrame.grid_forget()
 
 #admin Main Window
 adminFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
@@ -240,7 +239,7 @@ startVoterSessionBtn.grid(row=3, column=1, padx=(10,5), pady=(10,10))
 adminSettingBtn.grid(row=4, column=0, padx=(130,0), pady=(10,10), columnspan=2)
 adminLogoutBtn.grid(row=5, column=0, padx=(130,0), pady=(10,10), columnspan=2)
 
-adminFrame.pack_forget()
+adminFrame.grid_forget()
 
 #admin Settings Window
 adminSettingsFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
@@ -258,7 +257,7 @@ delAdminProfile.grid(row=3, column=1, padx=(5,0), ipadx=10)
 updateAdminProfile.grid(row=4, column=0, columnspan=2, padx=(125,0), pady=(15,0))
 backButton.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
-adminSettingsFrame.pack_forget()
+adminSettingsFrame.grid_forget()
 
 #Admin Voter Config Panel
 voterConfigFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
@@ -276,7 +275,7 @@ delAVoterRecord.grid(row=3, column=1, padx=(5,0), ipadx=25, pady=(0,10))
 displayVoters.grid(row=4, column=0, columnspan=2, padx=(100,0), ipadx=25)
 fromVoterConfigBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
-voterConfigFrame.pack_forget()
+voterConfigFrame.grid_forget()
 
 #Add Voter Win
 voterAddFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
@@ -284,7 +283,7 @@ voterNameAddLabel = ttk.Label(voterAddFrame, text="Enter voter Name:", font="mon
 voterAgeAddLabel = ttk.Label(voterAddFrame, text="Enter voter Age:", font="mont")
 voterAgeAddEntry = ttk.Entry(voterAddFrame, font="mont", textvariable=voterAgeData)
 voterNameAddEntry = ttk.Entry(voterAddFrame, font="mont", textvariable=voterNameData)
-voterChooseGenderMenu = ttk.OptionMenu(voterAddFrame, genderData, *genders, style="my.TOptionMenu")
+voterChooseGenderMenu = ttk.OptionMenu(voterAddFrame, genderData, "Male", "Male", "Female", "Other", style="my.TOptionMenu")
 voterChooseGenderLabel = ttk.Label(voterAddFrame, text="Choose Voter Gender", font="mont")
 fromAddVoterBtn = ttk.Button(voterAddFrame, text="< Back", style="my.TButton", command=fromAddVoter)
 
@@ -296,7 +295,7 @@ voterAgeAddEntry.grid(row=2, column=1)
 voterChooseGenderLabel.grid(row=3, column=0)
 voterChooseGenderMenu.grid(row=3, column=1)
 
-voterAddFrame.pack_forget()
+voterAddFrame.grid_forget()
 
 #Admin Candidate Config Panel
 candConfigFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
@@ -314,9 +313,19 @@ delACandRecord.grid(row=3, column=1, padx=(5,0), ipadx=25, pady=(0,10))
 displayCand.grid(row=4, column=0, columnspan=2, padx=(90,0), ipadx=25)
 fromCandConfigBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
-candConfigFrame.pack_forget()
+candConfigFrame.grid_forget()
+
+mainFrame.grid_propagate(0)
+adminFrame.grid_propagate(0)
+adminSettingsFrame.grid_propagate(0)
+voterConfigFrame.grid_propagate(0)
+voterAddFrame.grid_propagate(0)
+candConfigFrame.grid_propagate(0)
 
 openDebugWin()
 showPanel(mainFrame)
 root.bind("<Return>", submitOnClick)
+root.grid_propagate(False)
+root.grid_rowconfigure(0, weight=1)
+root.grid_columnconfigure(0, weight=1)
 root.mainloop()
