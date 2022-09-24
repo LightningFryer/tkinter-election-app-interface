@@ -1,9 +1,6 @@
-from email import message
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-from turtle import st
-from unicodedata import name
 from helper import *
 from eAuth import *
 from modify import *
@@ -14,7 +11,11 @@ import sv_ttk as theme
 root = Tk()
 root.title("Election App Mockup")
 theme.set_theme("dark")
-root.geometry("800x600")
+winWidth, winHeight = 800, 600
+screenWidth, screenHeight = root.winfo_screenwidth(), root.winfo_screenheight()
+x = (screenWidth/2) - (winWidth/2)
+y = (screenHeight/2) - (winHeight/2)
+root.geometry(f"{winWidth}x{winHeight}+{int(x)}+{int(y)}")
 root.resizable(0,0)
 
 crntPanel = ""
@@ -28,7 +29,7 @@ framestyle = ttk.Style().configure("my.TLabelframe", font=("mont",))
 #Option Menu Style
 opmenustyle = ttk.Style().configure("my.TOptionMenu", font=("mont",))
 
-#textvariable data of buttons is stored here        
+#textvariable data of buttons/OptionMenu is stored here        
 genders = ["Male", "Male", "Female", "Other"]
 nameData = StringVar()
 uidData = StringVar()
@@ -37,7 +38,9 @@ voterNameData = StringVar()
 voterAgeData = StringVar()
 genderData = StringVar()
 genderData.set(genders[0])
+voterDelData = StringVar()
 
+#Voter/Candidate Lists 
 def showVoterList():
     hidePanel(voterConfigFrame)
     global ListFrame, voterListData
@@ -101,12 +104,13 @@ def showCandList():
     for i in range(1,len(candListData)):
         Label(canvasFrame, text=f"ID: {candListData[i][0]}   Name: {candListData[i][1]}   Age: {candListData[i][2]}   Sex: {candListData[i][3]}   Symbol: {candListData[i][4]}", font="mont").grid(row=i+1, column=0, sticky=W)
 
+#Debug Window
 def openDebugWin():
     global btnstyle
     global debugWin
     debugWin = Toplevel()
     debugWin.title("Debug Operations")
-    consoleVoterListBtn = ttk.Button(debugWin, text="Voter List", command=showVoterList, style="my.TButton").grid(row=0, column=0, padx=15, ipadx=35, pady=15)
+    consoleVoterListBtn = ttk.Button(debugWin, text="Voter List", command=display_voters_debug, style="my.TButton").grid(row=0, column=0, padx=15, ipadx=35, pady=15)
     consoleCandidateListBtn = ttk.Button(debugWin, text="Candidate List", command=display_candidates_debug, style="my.TButton").grid(row=1, column=0, ipadx=30, pady=15)
     autoLogin = ttk.Button(debugWin, text="Admin Login", command=openAdminWin, style="my.TButton").grid(row=2, column=0, padx=15, pady=15, ipadx=35,)
     testList = ttk.Button(debugWin, text="Test List", command=showVoterList, style="my.TButton").grid(row=3, column=0, padx=15, pady=15)
@@ -142,6 +146,42 @@ def voterAddSubmit(event = None):
             pickle.dump({"ID":UUIDgen, "Name":voterNameData.get()}, f)
         messagebox.showinfo(title="Success!", message="Successfully added details of Voter to Database!")
     
+def voterDelSubmit(event = None):
+    l = [] #Records to be rewritten are stored in this list
+    delVoterID = voterDelData.get()
+    response = messagebox.askyesno(title="Are you sure?", message=f"Are you sure you want to delete Voter {delVoterID}'s data?")
+    found = 0
+    if response == 1:
+        data = fetchVotersBIN() 
+        for i in data:
+            if data["ID"] == delVoterID:
+                found = 1
+                break
+        if found == 1:
+            messagebox.showinfo("Successfully deleted Voter information!")
+            for i in data:
+                if data["ID"] == delVoterID: #Storing all the records except the record to delete
+                    delVoterName = data["Name"]
+                    continue
+                l.append(i)
+
+            with open("Data/voterList.dat", 'wb') as f: #Writing all the records except the record to delete
+                for i in l:
+                    pickle.dump(i, f)
+
+            l = [] #Records to be rewritten are stored in this list
+
+            data = fetchVotersCSV()
+            for i in data:
+                if i[0] != delVoterName: #Storing all records except the record to delete
+                    l.append(i)
+
+            with open("Data/voterList.csv", "w") as f: #Writing all the records except the record to delete
+                writer = csv.writer(f)
+                writer.writerows(l)
+        else:
+            messagebox.showerror(title="Voter Not Found!", message=f"Sorry but we couldn't find the voter with ID {delVoterID} in the list!")
+
 #Show/Hide Panel Commands
 def showPanel(frameName):
     frameName.pack(fill=BOTH, expand=True, padx=10, pady=10)
@@ -177,6 +217,10 @@ def openVoterAddWin():
     hidePanel(voterConfigFrame)
     showPanel(voterAddFrame)
 
+def openVoterDelWin():
+    hidePanel(voterConfigFrame)
+    showPanel(voterDelFrame)
+
 #Close/Hide Windows
 def fromAdminSettings():
     hidePanel(adminSettingsFrame)
@@ -196,6 +240,10 @@ def fromVoterList():
 
 def fromAddVoter():
     hidePanel(voterAddFrame)
+    showPanel(voterConfigFrame)
+
+def fromVoterDel():
+    hidePanel(voterDelFrame)
     showPanel(voterConfigFrame)
 
 def fromCandList():
@@ -280,7 +328,7 @@ voterConfigFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 voterConfigLabel = ttk.Label(voterConfigFrame, text="Voter Configuration", font="mont")
 voterConfigLabelSep = ttk.Separator(voterConfigFrame)
 addAVoterRecord = ttk.Button(voterConfigFrame, text="Add a new voter record", style="my.TButton", command=openVoterAddWin)
-delAVoterRecord = ttk.Button(voterConfigFrame, text="Delete a voter record", style="my.TButton")
+delAVoterRecord = ttk.Button(voterConfigFrame, text="Delete a voter record", style="my.TButton", command=openVoterDelWin)
 displayVoters = ttk.Button(voterConfigFrame, text="Display Voter List", style="my.TButton", command=showVoterList)
 fromVoterConfigBtn = ttk.Button(voterConfigFrame, text="< Back", style="my.TButton", command=fromVoterConfig)
 
@@ -315,6 +363,18 @@ voterChooseGenderMenu.grid(row=3, column=1)
 voterAddSubmitBtn.grid(row=4, column=0, columnspan=2, padx=(175,0), pady=(20,0), ipadx=15)
 
 voterAddFrame.pack_forget()
+
+#Delete a Voter Frame
+voterDelFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
+voterDelLabel = ttk.Label(voterDelFrame, text="Enter UID of Voter:", font="mont")
+voterDelEntry = ttk.Entry(voterDelFrame, textvariable=voterDelData, font="mont")
+voterDelSubmitBtn = ttk.Button(voterDelFrame, text="Submit", style="my.TButton", command=voterDelSubmit)
+fromVoterDelBtn = ttk.Button(voterDelFrame, text="< Back", style="my.TButton", command = fromVoterDel)
+
+voterDelLabel.grid(row=1, column=0, sticky=W, padx=(200,10), pady=(175,0))
+voterDelEntry.grid(row=1, column=1, pady=(175,0))
+voterDelSubmitBtn.grid(row=2, column=0, columnspan=2, padx=(200,0), pady=(20,0), ipadx=20)
+fromVoterDelBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
 #Admin Candidate Config Panel
 candConfigFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
