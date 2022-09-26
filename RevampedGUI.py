@@ -33,16 +33,17 @@ opmenustyle = ttk.Style().configure("my.TOptionMenu", font=("mont",))
 genders = ["Male", "Male", "Female", "Other"]
 nameData = StringVar()
 uidData = StringVar()
-candData = StringVar()
-voterNameData = StringVar()
-voterAgeData = StringVar()
-genderData = StringVar()
+candData= StringVar()
+voterNameData= StringVar()
+voterAgeData= StringVar()
+genderData= StringVar()
+voterDelData= StringVar()
+candNameData= StringVar()
+candAgeData= StringVar()
+candSymData= StringVar()
+candDescData= StringVar()
+candDelData = StringVar()
 genderData.set(genders[0])
-voterDelData = StringVar()
-candNameData = StringVar()
-candAgeData = StringVar()
-candSymData = StringVar()
-candDescData = StringVar()
 
 #Voter/Candidate Lists 
 def showVoterList():
@@ -193,6 +194,28 @@ def candAddSubmit(event = None):
             writer.writerow([addCandidateID,addCandidateName,addCandidateAge,addCandidateSex,addCandidateSymbol,addCandidateDesc])
         messagebox.showinfo(title="Success!", message="Successfully added details of Candidate into Database!")
 
+def candDelSubmit(event = None):
+    delCandidateID = candDelData.get()
+    found = False
+    data = fetchCandidates()
+    for i in data:
+        if i != [] and i[0] == delCandidateID:
+            found = True
+            break
+    if found:
+        l = [] #Records to be rewritten are stored in this list
+        for i in data:
+            if i != [] and i[0] == delCandidateID: #Storing all the records except the one to be deleted
+                continue
+            l.append(i)
+
+        with open("Data/candidateList.csv", 'w', encoding = 'utf8') as f: #Writing all the records except the one to be deleted
+            writer = csv.writer(f)
+            writer.writerows(l)
+        messagebox.showinfo(title="Success!", message="Successfully deleted details of Candidate from Database!")
+    else:
+        messagebox.showerror(title="Error!", message="No such Candidate ID found in Database!")
+
 #Show/Hide Panel Commands
 def showPanel(frameName):
     frameName.pack(fill=BOTH, expand=True, padx=10, pady=10)
@@ -236,6 +259,10 @@ def openCandAddWin():
     hidePanel(candConfigFrame)
     showPanel(candAddFrame)
 
+def openCandDelWin():
+    hidePanel(candConfigFrame)
+    showPanel(candDelFrame)
+
 #Close/Hide Windows
 def fromAdminSettings():
     hidePanel(adminSettingsFrame)
@@ -259,6 +286,10 @@ def fromAddVoter():
 
 def fromCandAdd():
     hidePanel(candAddFrame)
+    showPanel(candConfigFrame)
+
+def fromCandDel():
+    hidePanel(candDelFrame)
     showPanel(candConfigFrame)
 
 def fromVoterDel():
@@ -389,7 +420,7 @@ candConfigFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 candConfigLabel = ttk.Label(candConfigFrame, text="Candidate Configuration", font="mont")
 candConfigLabelSep = ttk.Separator(candConfigFrame)
 addACandRecord = ttk.Button(candConfigFrame, text="Add a new Candidate record", style="my.TButton", command=openCandAddWin)
-delACandRecord = ttk.Button(candConfigFrame, text="Delete a Candidate record", style="my.TButton")
+delACandRecord = ttk.Button(candConfigFrame, text="Delete a Candidate record", style="my.TButton", command=openCandDelWin)
 displayCand = ttk.Button(candConfigFrame, text="Display Candidate List", style="my.TButton", command=showCandList)
 fromCandConfigBtn = ttk.Button(candConfigFrame, text="< Back", style="my.TButton", command=fromCandConfig)
 
@@ -431,6 +462,20 @@ candAddSubmitBtn.grid(row=6, column=0, columnspan=2, padx=(175,0), pady=(15,0), 
 fromCandAddBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
 candAddFrame.pack_forget()
+
+#Candidate Delete Panel
+
+candDelFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
+candDelLabel = ttk.Label(candDelFrame, text="Enter UID of Candidate:", font="mont")
+candDelEntry = ttk.Entry(candDelFrame, textvariable=candDelData, font="mont")
+candDelSubmitBtn = ttk.Button(candDelFrame, text="Submit", style="my.TButton", command=candDelSubmit)
+fromCandDelBtn = ttk.Button(candDelFrame, text="< Back", style="my.TButton", command = fromCandDel)
+
+candDelLabel.grid(row=1, column=0, sticky=W, padx=(200,10), pady=(175,0))
+candDelEntry.grid(row=1, column=1, pady=(175,0))
+candDelSubmitBtn.grid(row=2, column=0, columnspan=2, padx=(200,0), pady=(20,0), ipadx=20)
+fromCandDelBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
+
 
 openDebugWin()
 showPanel(mainFrame)
