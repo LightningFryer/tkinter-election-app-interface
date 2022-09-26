@@ -62,7 +62,7 @@ def showVoterList():
 
     canvasFrame = ttk.Frame(ListCanvas)
     ListCanvas.create_window((0,0), window=canvasFrame, anchor=NW)
-    voterListData = fetchVotersBIN()
+    voterListData = fetchVoters()
     
     fromVoterListBtn = ttk.Button(ListFrame, text="< Back", style="my.TButton", command=fromVoterList)
     fromVoterListBtn.grid(row=2, padx=(7,0), columnspan=2, pady=(15,0))
@@ -110,8 +110,8 @@ def openDebugWin():
     global debugWin
     debugWin = Toplevel()
     debugWin.title("Debug Operations")
-    consoleVoterListBtn = ttk.Button(debugWin, text="Voter List", command=display_voters_debug, style="my.TButton").grid(row=0, column=0, padx=15, ipadx=35, pady=15)
-    consoleCandidateListBtn = ttk.Button(debugWin, text="Candidate List", command=display_candidates_debug, style="my.TButton").grid(row=1, column=0, ipadx=30, pady=15)
+    consoleVoterListBtn = ttk.Button(debugWin, text="Voter List", command=fetchVotersDebug, style="my.TButton").grid(row=0, column=0, padx=15, ipadx=35, pady=15)
+    consoleCandidateListBtn = ttk.Button(debugWin, text="Candidate List", command=fetchCandidatesDebug, style="my.TButton").grid(row=1, column=0, ipadx=30, pady=15)
     autoLogin = ttk.Button(debugWin, text="Admin Login", command=openAdminWin, style="my.TButton").grid(row=2, column=0, padx=15, pady=15, ipadx=35,)
     testList = ttk.Button(debugWin, text="Test List", command=showVoterList, style="my.TButton").grid(row=3, column=0, padx=15, pady=15)
 
@@ -138,49 +138,39 @@ def voterAddSubmit(event = None):
     UUIDgen = str(uuid.uuid4()).split("-")[0]
     response = messagebox.askyesno(title="Are you sure?", message="Do you want to add Voter's details to Databse?")
     if response == 1:
-        with open("Data/voterList.csv", "a") as f:
-            writer = csv.writer(f)
-            writer.writerow([voterNameData.get(), voterAgeData.get(), int(genderData.get())])
+        try:
+            with open("Data/voterList.csv", "a") as f:
+                writer = csv.writer(f)
+                writer.writerow([UUIDgen, voterNameData.get(), voterAgeData.get(), genderData.get(), "N"])
 
-        with open("Data/voterList.dat", "ab") as f:
-            pickle.dump({"ID":UUIDgen, "Name":voterNameData.get()}, f)
-        messagebox.showinfo(title="Success!", message="Successfully added details of Voter to Database!")
+            with open("Data/voterList.dat", "ab") as f:
+                pickle.dump({"ID":UUIDgen, "Name":voterNameData.get()}, f)
+            messagebox.showinfo(title="Success!", message="Successfully added details of Voter to Database!")
+        except:
+            messagebox.showerror(title="Error!", message="Unknown Excpetion! Could not add Voter Data to Database!")
     
 def voterDelSubmit(event = None):
+    found = False
+
+    delVoterUUID = voterDelData.get()
     l = [] #Records to be rewritten are stored in this list
-    delVoterID = voterDelData.get()
-    response = messagebox.askyesno(title="Are you sure?", message=f"Are you sure you want to delete Voter {delVoterID}'s data?")
-    found = 0
-    if response == 1:
-        data = fetchVotersBIN() 
-        for i in data:
-            if data["ID"] == delVoterID:
-                found = 1
-                break
-        if found == 1:
-            messagebox.showinfo("Successfully deleted Voter information!")
-            for i in data:
-                if data["ID"] == delVoterID: #Storing all the records except the record to delete
-                    delVoterName = data["Name"]
-                    continue
-                l.append(i)
 
-            with open("Data/voterList.dat", 'wb') as f: #Writing all the records except the record to delete
-                for i in l:
-                    pickle.dump(i, f)
+    data = fetchVoters()
+    for i in data:
+        if i != []:
+            if i[0] == delVoterUUID: #Storing all records except the record to delete
+                found = True
+                continue
+        l.append(i)
+        
+    if found:    
+        messagebox.showinfo(title="Success!", message="Voter information successfully deleted!")
+    else:
+        messagebox.showerror(title="Error!", message=f"Sorry but we couldn't find the voter with ID {delVoterUUID} in the list!")
 
-            l = [] #Records to be rewritten are stored in this list
-
-            data = fetchVotersCSV()
-            for i in data:
-                if i[0] != delVoterName: #Storing all records except the record to delete
-                    l.append(i)
-
-            with open("Data/voterList.csv", "w") as f: #Writing all the records except the record to delete
-                writer = csv.writer(f)
-                writer.writerows(l)
-        else:
-            messagebox.showerror(title="Voter Not Found!", message=f"Sorry but we couldn't find the voter with ID {delVoterID} in the list!")
+    with open("Data/voterList.csv", "w") as f: #Writing all the records except the record to delete
+        writer = csv.writer(f)
+        writer.writerows(l)
 
 #Show/Hide Panel Commands
 def showPanel(frameName):
