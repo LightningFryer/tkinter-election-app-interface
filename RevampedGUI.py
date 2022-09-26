@@ -39,6 +39,10 @@ voterAgeData = StringVar()
 genderData = StringVar()
 genderData.set(genders[0])
 voterDelData = StringVar()
+candNameData = StringVar()
+candAgeData = StringVar()
+candSymData = StringVar()
+candDescData = StringVar()
 
 #Voter/Candidate Lists 
 def showVoterList():
@@ -69,9 +73,10 @@ def showVoterList():
     voterListSep = ttk.Separator(ListFrame)
     voterListSep.grid(row=1, columnspan=2, sticky=EW, ipady=2)
 
-    for i in range(len(voterListData)):
-        Label(canvasFrame, text=f"ID: {voterListData[i]['ID']}", font="mont").grid(row=i+1, column=0, sticky=W, padx=(180,100))
-        Label(canvasFrame, text=f"Name: {voterListData[i]['Name']}", font="mont").grid(row=i+1, column=1, sticky=W)
+    for i in range(1,len(voterListData)):
+        if voterListData[i] != []:
+            Label(canvasFrame, text=f"ID: {voterListData[i][0]}", font="mont").grid(row=i+1, column=0, sticky=W, padx=(180,100))
+            Label(canvasFrame, text=f"Name: {voterListData[i][1]}", font="mont").grid(row=i+1, column=1, sticky=W)
 
 def showCandList():
     hidePanel(candConfigFrame)
@@ -211,6 +216,10 @@ def openVoterDelWin():
     hidePanel(voterConfigFrame)
     showPanel(voterDelFrame)
 
+def openCandAddWin():
+    hidePanel(candConfigFrame)
+    showPanel(candAddFrame)
+
 #Close/Hide Windows
 def fromAdminSettings():
     hidePanel(adminSettingsFrame)
@@ -231,6 +240,10 @@ def fromVoterList():
 def fromAddVoter():
     hidePanel(voterAddFrame)
     showPanel(voterConfigFrame)
+
+def fromCandAdd():
+    hidePanel(candAddFrame)
+    showPanel(candConfigFrame)
 
 def fromVoterDel():
     hidePanel(voterDelFrame)
@@ -370,7 +383,7 @@ fromVoterDelBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 candConfigFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 candConfigLabel = ttk.Label(candConfigFrame, text="Candidate Configuration", font="mont")
 candConfigLabelSep = ttk.Separator(candConfigFrame)
-addACandRecord = ttk.Button(candConfigFrame, text="Add a new Candidate record", style="my.TButton")
+addACandRecord = ttk.Button(candConfigFrame, text="Add a new Candidate record", style="my.TButton", command=openCandAddWin)
 delACandRecord = ttk.Button(candConfigFrame, text="Delete a Candidate record", style="my.TButton")
 displayCand = ttk.Button(candConfigFrame, text="Display Candidate List", style="my.TButton", command=showCandList)
 fromCandConfigBtn = ttk.Button(candConfigFrame, text="< Back", style="my.TButton", command=fromCandConfig)
@@ -383,6 +396,36 @@ displayCand.grid(row=4, column=0, columnspan=2, padx=(90,0), ipadx=25)
 fromCandConfigBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
 candConfigFrame.pack_forget()
+
+#Candidate Add Panel
+candAddFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
+candNameAddLabel = ttk.Label(candAddFrame, text="Enter Candidate Name:", font="mont")
+candNameAddEntry = ttk.Entry(candAddFrame, font="mont", textvariable=candNameData)
+candAgeAddLabel = ttk.Label(candAddFrame, text="Enter Candidate Age:", font="mont")
+candAgeAddEntry = ttk.Entry(candAddFrame, font="mont", textvariable=candAgeData)
+candSymAddLabel = ttk.Label(candAddFrame, text="Enter Candidate Symbol:", font="mont")
+candSymAddEntry = ttk.Entry(candAddFrame, font="mont", textvariable=candSymData)
+candDescAddLabel = ttk.Label(candAddFrame, text="Enter Candidate Description:", font="mont")
+candDescAddEntry = ttk.Entry(candAddFrame, font="mont", textvariable=candDescData)
+candChooseGenderMenu = ttk.OptionMenu(candAddFrame, genderData, *genders, style="my.TOptionMenu")
+candChooseGenderLabel = ttk.Label(candAddFrame, text="Choose Candidate Gender", font="mont")
+candAddSubmitBtn = ttk.Button(candAddFrame, text="Submit", style="my.TButton")
+fromCandAddBtn = ttk.Button(candAddFrame, text="< Back", style="my.TButton")
+
+candNameAddLabel.grid(row=1, column=0)
+candNameAddEntry.grid(row=1, column=1)
+candAgeAddLabel.grid(row=2, column=0)
+candAgeAddEntry.grid(row=2, column=1)
+candSymAddLabel.grid(row=3, column=0)
+candSymAddEntry.grid(row=3, column=1)
+candDescAddLabel.grid(row=4, column=0)
+candDescAddEntry.grid(row=4, column=1)
+candChooseGenderLabel.grid(row=5, column=0)
+candChooseGenderMenu.grid(row=5, column=1)
+candAddSubmitBtn.grid(row=6, column=0, columnspan=2)
+fromCandAddBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
+
+candAddFrame.pack_forget()
 
 openDebugWin()
 showPanel(mainFrame)
