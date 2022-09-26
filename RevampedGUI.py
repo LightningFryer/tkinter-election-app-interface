@@ -177,6 +177,22 @@ def voterDelSubmit(event = None):
         writer = csv.writer(f)
         writer.writerows(l)
 
+def candAddSubmit(event = None):
+    addCandidateName = candNameData.get()
+    addCandidateAge = candAgeData.get()
+    addCandidateSex = genderData.get()
+    addCandidateSymbol = candSymData.get()
+    addCandidateDesc = candDescData.get()
+    addCandidateID = str(uuid.uuid4()).split("-")[0]
+
+    response = messagebox.askyesno(title="Confirmation", message=f"Are you sure you want to add details of {addCandidateName} to Database?")
+
+    if response == 1:
+        with open("Data/candidateList.csv", "a", encoding = 'utf8') as f:
+            writer = csv.writer(f)
+            writer.writerow([addCandidateID,addCandidateName,addCandidateAge,addCandidateSex,addCandidateSymbol,addCandidateDesc])
+        messagebox.showinfo(title="Success!", message="Successfully added details of Candidate into Database!")
+
 #Show/Hide Panel Commands
 def showPanel(frameName):
     frameName.pack(fill=BOTH, expand=True, padx=10, pady=10)
@@ -257,17 +273,6 @@ def adminLogout():
     hidePanel(adminFrame)
     showPanel(mainFrame)
 
-# def adminCreate(): #Allows the admin to add a new admin user
-#     adminName = input("Admin Name: ")
-#     adminPassword = input("Password: ")
-#     if confirm():
-#         cred = {"Admin Name":caesarCipher.caesarEncrypt(adminName), "Password":caesarCipher.caesarEncrypt(adminPassword)} #Dictionary containing new admin details to be dumped
-
-#         with open("Data/cred.dat", "ab") as f: #Dumping the new admin's data
-#             pickle.dump(cred, f) 
-#         print(f"Added {adminName} as an administrator!")
-#     else:
-#         print("Aborting...")
 
 #main window widgets
 mainFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
@@ -409,20 +414,20 @@ candDescAddLabel = ttk.Label(candAddFrame, text="Enter Candidate Description:", 
 candDescAddEntry = ttk.Entry(candAddFrame, font="mont", textvariable=candDescData)
 candChooseGenderMenu = ttk.OptionMenu(candAddFrame, genderData, *genders, style="my.TOptionMenu")
 candChooseGenderLabel = ttk.Label(candAddFrame, text="Choose Candidate Gender", font="mont")
-candAddSubmitBtn = ttk.Button(candAddFrame, text="Submit", style="my.TButton")
-fromCandAddBtn = ttk.Button(candAddFrame, text="< Back", style="my.TButton")
+candAddSubmitBtn = ttk.Button(candAddFrame, text="Submit", style="my.TButton", command=candAddSubmit)
+fromCandAddBtn = ttk.Button(candAddFrame, text="< Back", style="my.TButton", command=fromCandAdd)
 
-candNameAddLabel.grid(row=1, column=0)
-candNameAddEntry.grid(row=1, column=1)
-candAgeAddLabel.grid(row=2, column=0)
-candAgeAddEntry.grid(row=2, column=1)
-candSymAddLabel.grid(row=3, column=0)
-candSymAddEntry.grid(row=3, column=1)
-candDescAddLabel.grid(row=4, column=0)
-candDescAddEntry.grid(row=4, column=1)
-candChooseGenderLabel.grid(row=5, column=0)
+candNameAddLabel.grid(row=1, column=0, sticky=W, pady=(125,0), padx=(175,10))
+candNameAddEntry.grid(row=1, column=1, pady=(125,10))
+candAgeAddLabel.grid(row=2, column=0, sticky=W, padx=(175,10))
+candAgeAddEntry.grid(row=2, column=1, pady=(0,10))
+candSymAddLabel.grid(row=3, column=0, sticky=W, padx=(175,10))
+candSymAddEntry.grid(row=3, column=1, pady=(0,10))
+candDescAddLabel.grid(row=4, column=0, sticky=W, padx=(175,10))
+candDescAddEntry.grid(row=4, column=1, pady=(0,10))
+candChooseGenderLabel.grid(row=5, column=0, sticky=W, padx=(175,10))
 candChooseGenderMenu.grid(row=5, column=1)
-candAddSubmitBtn.grid(row=6, column=0, columnspan=2)
+candAddSubmitBtn.grid(row=6, column=0, columnspan=2, padx=(175,0), pady=(15,0), ipadx=25)
 fromCandAddBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
 candAddFrame.pack_forget()
