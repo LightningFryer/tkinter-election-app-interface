@@ -1,9 +1,6 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-from urllib import response
-
-from pyparsing import col
 from helper import *
 from eAuth import *
 from modify import *
@@ -46,8 +43,8 @@ candAgeData= StringVar()
 candSymData= StringVar()
 candDescData= StringVar()
 candDelData = StringVar()
-adminAddNameData = StringVar()
-adminAddPassData = StringVar()
+adminNameData = StringVar()
+adminPassData = StringVar()
 genderData.set(genders[0])
 
 #Voter/Candidate Lists 
@@ -222,9 +219,9 @@ def candDelSubmit(event = None):
     else:
         messagebox.showerror(title="Error!", message="No such Candidate ID found in Database!")
 
-def adminAddSubmit():
-    adminName = adminAddNameData.get()
-    adminPassword = adminAddPassData.get()
+def adminAddSubmit(event = None):
+    adminName = adminNameData.get()
+    adminPassword = adminPassData.get()
     cred = {"Admin Name":caesarCipher.caesarEncrypt(adminName), "Password":caesarCipher.caesarEncrypt(adminPassword)} #Dictionary containing new admin details to be dumped
 
     response = messagebox.askyesno(title="Confirmation", message="Are you sure you want to add details of new Admin to Database?")
@@ -232,6 +229,34 @@ def adminAddSubmit():
         with open("Data/cred.dat", "ab") as f: #Dumping the new admin's data
             pickle.dump(cred, f)
         messagebox.showinfo(title="Success!", message="Successfully added details of Admin to Database!")
+
+def adminDelSubmit(event = None):
+    adminName = adminNameData.get()
+    adminPassword = adminPassData.get()
+    f = open("Data/cred.dat", "rb")
+    l = [] #Records to be rewritten are stored in this list
+    found = False
+    try: #Reading all records in cred.dat
+        while True: #Storing all records except the one to be deleted
+            data = pickle.load(f)
+            if adminName != caesarCipher.caesarDecrypt(data['Admin Name']):
+                l.append(data)
+            elif adminName == caesarCipher.caesarDecrypt(data['Admin Name']):
+                found = True
+                if adminPassword != caesarCipher.caesarDecrypt(data["Password"]):
+                    messagebox.showerror(title="Error!", message="Incorrect password of Admin given! Cannot authorise deletion of admin data without correct password so please try again!")
+                    f.close() #Will close the file and no record would be modified/deleted
+                    return
+    except EOFError:
+        f.close()
+        if not found: #Checks if the inputted admin name exists in the first place or not 
+            messagebox.showerror(title="Error!", message="Admin name does not exist in the database!") 
+            return
+        else:
+            messagebox.showinfo(title="Success!", message="Successfully deleted information of Admin!")                
+    with open("Data/cred.dat", "wb") as f: #Writing all records excluding the one to be deleted
+        for i in l:
+            pickle.dump(i, f)
 
 #Show/Hide Panel Commands
 def showPanel(frameName):
@@ -284,6 +309,10 @@ def openAdminAddWin():
     hidePanel(adminSettingsFrame)
     showPanel(adminAddFrame)
 
+def openAdminDelWin():
+    hidePanel(adminSettingsFrame)
+    showPanel(adminDelFrame)
+
 #Close/Hide Windows
 def fromAdminSettings():
     hidePanel(adminSettingsFrame)
@@ -323,6 +352,10 @@ def fromCandList():
 
 def fromAdminAdd():
     hidePanel(adminAddFrame)
+    showPanel(adminSettingsFrame)
+
+def fromAdminDel():
+    hidePanel(adminDelFrame)
     showPanel(adminSettingsFrame)
 
 def adminLogout():
@@ -374,7 +407,7 @@ adminSettingsFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 adminSetttingLabel = ttk.Label(adminSettingsFrame, text="Admin Settings", font="mont")
 adminSetttingLabelSep = ttk.Separator(adminSettingsFrame)
 addAdminProfile = ttk.Button(adminSettingsFrame, text="Create a new Admin Profile", style="my.TButton", command=openAdminAddWin)
-delAdminProfile = ttk.Button(adminSettingsFrame, text="Delete an Admin Profile   ", style="my.TButton")
+delAdminProfile = ttk.Button(adminSettingsFrame, text="Delete an Admin Profile   ", style="my.TButton", command=openAdminDelWin)
 updateAdminProfile = ttk.Button(adminSettingsFrame, text="Update an Admin Profile", style="my.TButton")
 backButton = ttk.Button(adminSettingsFrame, text="< Back", style="my.TButton", command=fromAdminSettings)
 
@@ -390,9 +423,9 @@ adminSettingsFrame.pack_forget()
 #Admin Add Panel
 adminAddFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 adminAddNameLabel = ttk.Label(adminAddFrame, text="Enter Admin Name:", font="mont")
-adminAddNameEntry = ttk.Entry(adminAddFrame, textvariable=adminAddNameData, font="mont")
+adminAddNameEntry = ttk.Entry(adminAddFrame, textvariable=adminNameData, font="mont")
 adminAddPassLabel = ttk.Label(adminAddFrame, text="Enter Admin Password:", font="mont")
-adminAddPassEntry = ttk.Entry(adminAddFrame, textvariable=adminAddPassData, font="mont")
+adminAddPassEntry = ttk.Entry(adminAddFrame, textvariable=adminPassData, font="mont")
 adminAddSubmitBtn = ttk.Button(adminAddFrame, text="Submit", style="my.TButton", command=adminAddSubmit)
 fromAdminAddBtn = ttk.Button(adminAddFrame, text="< Back", style="my.TButton", command=fromAdminAdd)
 
@@ -404,6 +437,17 @@ adminAddSubmitBtn.grid(row=3, column=0, columnspan=2)
 fromAdminAddBtn.grid(row=0, column=0, sticky=NW)
 
 adminAddFrame.pack_forget()
+
+#Admin Delete Panel
+adminDelFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
+adminDelNameLabel = ttk.Label(adminDelFrame, text="Enter Admin Name:", font="mont")
+adminDelNameEntry = ttk.Entry(adminDelFrame, font="mont", textvariable=adminNameData)
+adminDelPassLabel = ttk.Label(adminDelFrame, text="Enter Admin Password:", font="mont")
+adminDelPassEntry = ttk.Entry(adminDelFrame, font="mont", textvariable=adminPassData)
+adminDelSubmitBtn = ttk.Button(adminDelFrame, text="Submit", style="my.TButton", command=adminDelSubmit)
+fromAdminDelBtn = ttk.Button(adminDelFrame, text="< Back", style="my.TButton", command=fromAdminDel)
+
+adminDelFrame.pack_forget()
 
 #Admin Voter Config Panel
 voterConfigFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
