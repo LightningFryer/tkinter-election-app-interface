@@ -1,6 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+from urllib import response
+
+from pyparsing import col
 from helper import *
 from eAuth import *
 from modify import *
@@ -43,6 +46,8 @@ candAgeData= StringVar()
 candSymData= StringVar()
 candDescData= StringVar()
 candDelData = StringVar()
+adminAddNameData = StringVar()
+adminAddPassData = StringVar()
 genderData.set(genders[0])
 
 #Voter/Candidate Lists 
@@ -108,7 +113,8 @@ def showCandList():
     candListSep.grid(row=1, columnspan=2, sticky=EW, ipady=2)
 
     for i in range(1,len(candListData)):
-        Label(canvasFrame, text=f"ID: {candListData[i][0]}   Name: {candListData[i][1]}   Age: {candListData[i][2]}   Sex: {candListData[i][3]}   Symbol: {candListData[i][4]}", font="mont").grid(row=i+1, column=0, sticky=W)
+        if candListData[i] != []:
+            Label(canvasFrame, text=f"ID: {candListData[i][0]}   Name: {candListData[i][1]}   Age: {candListData[i][2]}   Sex: {candListData[i][3]}   Symbol: {candListData[i][4]}", font="mont").grid(row=i+1, column=0, sticky=W)
 
 #Debug Window
 def openDebugWin():
@@ -216,6 +222,17 @@ def candDelSubmit(event = None):
     else:
         messagebox.showerror(title="Error!", message="No such Candidate ID found in Database!")
 
+def adminAddSubmit():
+    adminName = adminAddNameData.get()
+    adminPassword = adminAddPassData.get()
+    cred = {"Admin Name":caesarCipher.caesarEncrypt(adminName), "Password":caesarCipher.caesarEncrypt(adminPassword)} #Dictionary containing new admin details to be dumped
+
+    response = messagebox.askyesno(title="Confirmation", message="Are you sure you want to add details of new Admin to Database?")
+    if response == 1:
+        with open("Data/cred.dat", "ab") as f: #Dumping the new admin's data
+            pickle.dump(cred, f)
+        messagebox.showinfo(title="Success!", message="Successfully added details of Admin to Database!")
+
 #Show/Hide Panel Commands
 def showPanel(frameName):
     frameName.pack(fill=BOTH, expand=True, padx=10, pady=10)
@@ -263,6 +280,10 @@ def openCandDelWin():
     hidePanel(candConfigFrame)
     showPanel(candDelFrame)
 
+def openAdminAddWin():
+    hidePanel(adminSettingsFrame)
+    showPanel(adminAddFrame)
+
 #Close/Hide Windows
 def fromAdminSettings():
     hidePanel(adminSettingsFrame)
@@ -299,6 +320,10 @@ def fromVoterDel():
 def fromCandList():
     hidePanel(ListFrame)
     showPanel(candConfigFrame)
+
+def fromAdminAdd():
+    hidePanel(adminAddFrame)
+    showPanel(adminSettingsFrame)
 
 def adminLogout():
     hidePanel(adminFrame)
@@ -348,7 +373,7 @@ adminFrame.pack_forget()
 adminSettingsFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 adminSetttingLabel = ttk.Label(adminSettingsFrame, text="Admin Settings", font="mont")
 adminSetttingLabelSep = ttk.Separator(adminSettingsFrame)
-addAdminProfile = ttk.Button(adminSettingsFrame, text="Create a new Admin Profile", style="my.TButton")
+addAdminProfile = ttk.Button(adminSettingsFrame, text="Create a new Admin Profile", style="my.TButton", command=openAdminAddWin)
 delAdminProfile = ttk.Button(adminSettingsFrame, text="Delete an Admin Profile   ", style="my.TButton")
 updateAdminProfile = ttk.Button(adminSettingsFrame, text="Update an Admin Profile", style="my.TButton")
 backButton = ttk.Button(adminSettingsFrame, text="< Back", style="my.TButton", command=fromAdminSettings)
@@ -361,6 +386,24 @@ updateAdminProfile.grid(row=4, column=0, columnspan=2, padx=(125,0), pady=(15,0)
 backButton.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
 adminSettingsFrame.pack_forget()
+
+#Admin Add Panel
+adminAddFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
+adminAddNameLabel = ttk.Label(adminAddFrame, text="Enter Admin Name:", font="mont")
+adminAddNameEntry = ttk.Entry(adminAddFrame, textvariable=adminAddNameData, font="mont")
+adminAddPassLabel = ttk.Label(adminAddFrame, text="Enter Admin Password:", font="mont")
+adminAddPassEntry = ttk.Entry(adminAddFrame, textvariable=adminAddPassData, font="mont")
+adminAddSubmitBtn = ttk.Button(adminAddFrame, text="Submit", style="my.TButton", command=adminAddSubmit)
+fromAdminAddBtn = ttk.Button(adminAddFrame, text="< Back", style="my.TButton", command=fromAdminAdd)
+
+adminAddNameLabel.grid(row=1, column=0, sticky=W)
+adminAddNameEntry.grid(row=1, column=1)
+adminAddPassLabel.grid(row=2, column=0, sticky=W)
+adminAddPassEntry.grid(row=2, column=1)
+adminAddSubmitBtn.grid(row=3, column=0, columnspan=2)
+fromAdminAddBtn.grid(row=0, column=0, sticky=NW)
+
+adminAddFrame.pack_forget()
 
 #Admin Voter Config Panel
 voterConfigFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
