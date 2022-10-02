@@ -45,6 +45,7 @@ candDescData= StringVar()
 candDelData = StringVar()
 adminNameData = StringVar()
 adminPassData = StringVar()
+adminNewPassData = StringVar()
 genderData.set(genders[0])
 
 #Voter/Candidate Lists 
@@ -258,6 +259,37 @@ def adminDelSubmit(event = None):
         for i in l:
             pickle.dump(i, f)
 
+def adminUpdateSubmit():
+    adminUpdateErrorLabel.grid_forget()
+    adminName = adminNameData.get()
+    adminPassword = adminPassData.get()
+    adminNewPassword = adminNewPassData.get()
+
+    found = False
+    f = open("Data/cred.dat", "rb")
+    l = [] #Records to be rewritten are stored in this list
+    try: #Searching for the record to be modified
+        while True:
+            data = pickle.load(f)
+            if adminName == caesarCipher.caesarDecrypt(data['Admin Name']) and adminPassword == caesarCipher.caesarDecrypt(data["Password"]):
+                found = True
+            l.append(data)  
+    except EOFError:
+        f.close()
+    if found: #Checks if the inputted admin name exists in the first place or not 
+        response = messagebox.askyesno(title="Confirmation", message="Are you sure you want to change the password? This change is irrevocable if you forget the new password!")
+        if response == 1:
+            adminUpdateErrorLabel.grid_remove()
+            for i in l:
+                if caesarCipher.caesarDecrypt(i["Admin Name"]) ==  adminName:
+                    i["Password"] = caesarCipher.caesarEncrypt(adminNewPassword) #Modifying the old password with the new password
+            messagebox.showinfo(title="Success!", message=f"{adminName}'s password updated!")
+    else:
+        adminUpdateErrorLabel.grid(row=5, column=0, columnspan=2) 
+    with open("Data/cred.dat", 'wb') as f: #Writing back all the records including the modified one
+        for i in l:
+            pickle.dump(i, f)
+
 #Show/Hide Panel Commands
 def showPanel(frameName):
     frameName.pack(fill=BOTH, expand=True, padx=10, pady=10)
@@ -313,6 +345,10 @@ def openAdminDelWin():
     hidePanel(adminSettingsFrame)
     showPanel(adminDelFrame)
 
+def openAdminUpdateWin():
+    hidePanel(adminSettingsFrame)
+    showPanel(adminUpdateFrame)
+
 #Close/Hide Windows
 def fromAdminSettings():
     hidePanel(adminSettingsFrame)
@@ -358,6 +394,10 @@ def fromAdminDel():
     hidePanel(adminDelFrame)
     showPanel(adminSettingsFrame)
 
+def fromAdminUpdate():
+    hidePanel(adminUpdateFrame)
+    showPanel(adminSettingsFrame)
+
 def adminLogout():
     hidePanel(adminFrame)
     showPanel(mainFrame)
@@ -370,7 +410,7 @@ nameEntry = ttk.Entry(mainFrame, font="mont",textvariable=nameData)
 passLabel = ttk.Label(mainFrame, text="Enter your Password:", font="mont")
 passEntry = ttk.Entry(mainFrame, font="mont", textvariable=uidData, show="*")
 loginbtn = ttk.Button(mainFrame, text="Login",command=submitOnClick, style="my.TButton")
-loginErrorLabel = ttk.Label(mainFrame, font="mont", text="Sorry but it seems like\nyou aren't in the Voters' List!", justify=CENTER)
+loginErrorLabel = ttk.Label(mainFrame, font="mont", text="Sorry but it seems like\nyou aren't in the Admins' List!", justify=CENTER)
 
 nameLabel.grid(row=0, column=0, sticky=W, padx=(200,30), pady=(220,0))
 nameEntry.grid(row=0, column=1, padx=(15,90), pady=(220,0))
@@ -408,7 +448,7 @@ adminSetttingLabel = ttk.Label(adminSettingsFrame, text="Admin Settings", font="
 adminSetttingLabelSep = ttk.Separator(adminSettingsFrame)
 addAdminProfile = ttk.Button(adminSettingsFrame, text="Create a new Admin Profile", style="my.TButton", command=openAdminAddWin)
 delAdminProfile = ttk.Button(adminSettingsFrame, text="Delete an Admin Profile   ", style="my.TButton", command=openAdminDelWin)
-updateAdminProfile = ttk.Button(adminSettingsFrame, text="Update an Admin Profile", style="my.TButton")
+updateAdminProfile = ttk.Button(adminSettingsFrame, text="Update an Admin Profile", style="my.TButton", command=openAdminUpdateWin)
 backButton = ttk.Button(adminSettingsFrame, text="< Back", style="my.TButton", command=fromAdminSettings)
 
 adminSetttingLabel.grid(row=1, column=0, columnspan=2, pady=(150,15), padx=(150,0))
@@ -429,12 +469,12 @@ adminAddPassEntry = ttk.Entry(adminAddFrame, textvariable=adminPassData, font="m
 adminAddSubmitBtn = ttk.Button(adminAddFrame, text="Submit", style="my.TButton", command=adminAddSubmit)
 fromAdminAddBtn = ttk.Button(adminAddFrame, text="< Back", style="my.TButton", command=fromAdminAdd)
 
-adminAddNameLabel.grid(row=1, column=0, sticky=W)
-adminAddNameEntry.grid(row=1, column=1)
-adminAddPassLabel.grid(row=2, column=0, sticky=W)
+adminAddNameLabel.grid(row=1, column=0, sticky=W, pady=(170,10), padx=(200,10))
+adminAddNameEntry.grid(row=1, column=1, pady=(170,10))
+adminAddPassLabel.grid(row=2, column=0, sticky=W, padx=(200,10))
 adminAddPassEntry.grid(row=2, column=1)
-adminAddSubmitBtn.grid(row=3, column=0, columnspan=2)
-fromAdminAddBtn.grid(row=0, column=0, sticky=NW)
+adminAddSubmitBtn.grid(row=3, column=0, columnspan=2, padx=(150,0), pady=(20,0), ipadx=25)
+fromAdminAddBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
 adminAddFrame.pack_forget()
 
@@ -447,7 +487,37 @@ adminDelPassEntry = ttk.Entry(adminDelFrame, font="mont", textvariable=adminPass
 adminDelSubmitBtn = ttk.Button(adminDelFrame, text="Submit", style="my.TButton", command=adminDelSubmit)
 fromAdminDelBtn = ttk.Button(adminDelFrame, text="< Back", style="my.TButton", command=fromAdminDel)
 
+adminDelNameLabel.grid(row=1, column=0, sticky=W, pady=(170,10), padx=(200,10))
+adminDelNameEntry.grid(row=1, column=1, pady=(170,10))
+adminDelPassLabel.grid(row=2, column=0, sticky=W, padx=(200,10))
+adminDelPassEntry.grid(row=2, column=1)
+adminDelSubmitBtn.grid(row=3, column=0, columnspan=2, padx=(150,0), pady=(20,0), ipadx=25)
+fromAdminDelBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
+
 adminDelFrame.pack_forget()
+
+#Admin Update Panel
+adminUpdateFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
+adminUpdateNameLabel = ttk.Label(adminUpdateFrame, text="Enter Admin Name:", font="mont")
+adminUpdateNameEntry = ttk.Entry(adminUpdateFrame, textvariable=adminNameData, font="mont")
+adminUpdatePassLabel = ttk.Label(adminUpdateFrame, text="Enter Admin Password:", font="mont")
+adminUpdatePassEntry = ttk.Entry(adminUpdateFrame, textvariable=adminPassData, font="mont", show="*")
+adminUpdateNewPassLabel = ttk.Label(adminUpdateFrame, text="Enter New Password:", font="mont")
+adminUpdateNewPassEntry = ttk.Entry(adminUpdateFrame, textvariable=adminNewPassData, font="mont", show="*")
+adminUpdateSubmitBtn = ttk.Button(adminUpdateFrame, text="Submit", style="my.TButton", command=adminUpdateSubmit)
+fromAdminUpdateBtn = ttk.Button(adminUpdateFrame, text="< Back", style="my.TButton", command=fromAdminUpdate)
+adminUpdateErrorLabel = ttk.Label(adminUpdateFrame, text="Error! No such Admin Name exists\nwithin database!", justify=CENTER, font="mont")
+
+adminUpdateNameLabel.grid(row=1, column=0, sticky=W, pady=(150,10), padx=(200,10))
+adminUpdateNameEntry.grid(row=1, column=1, pady=(150,10))
+adminUpdatePassLabel.grid(row=2, column=0, sticky=W, padx=(200,10))
+adminUpdatePassEntry.grid(row=2, column=1, pady=(0,10))
+adminUpdateNewPassLabel.grid(row=3, column=0, sticky=W, padx=(200,10))
+adminUpdateNewPassEntry.grid(row=3, column=1)
+adminUpdateSubmitBtn.grid(row=4, column=0, columnspan=2, padx=(150,0), pady=(20,10), ipadx=25)
+fromAdminUpdateBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
+
+adminUpdateFrame.pack_forget()
 
 #Admin Voter Config Panel
 voterConfigFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
@@ -502,6 +572,8 @@ voterDelEntry.grid(row=1, column=1, pady=(175,0))
 voterDelSubmitBtn.grid(row=2, column=0, columnspan=2, padx=(200,0), pady=(20,0), ipadx=20)
 fromVoterDelBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
+voterDelFrame.pack_forget()
+
 #Admin Candidate Config Panel
 candConfigFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 candConfigLabel = ttk.Label(candConfigFrame, text="Candidate Configuration", font="mont")
@@ -551,18 +623,18 @@ fromCandAddBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 candAddFrame.pack_forget()
 
 #Candidate Delete Panel
-
 candDelFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 candDelLabel = ttk.Label(candDelFrame, text="Enter UID of Candidate:", font="mont")
 candDelEntry = ttk.Entry(candDelFrame, textvariable=candDelData, font="mont")
 candDelSubmitBtn = ttk.Button(candDelFrame, text="Submit", style="my.TButton", command=candDelSubmit)
-fromCandDelBtn = ttk.Button(candDelFrame, text="< Back", style="my.TButton", command = fromCandDel)
+fromCandDelBtn = ttk.Button(candDelFrame, text="< Back", style="my.TButton", command=fromCandDel)
 
 candDelLabel.grid(row=1, column=0, sticky=W, padx=(200,10), pady=(175,0))
 candDelEntry.grid(row=1, column=1, pady=(175,0))
 candDelSubmitBtn.grid(row=2, column=0, columnspan=2, padx=(200,0), pady=(20,0), ipadx=20)
 fromCandDelBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
+candDelFrame.pack_forget()
 
 openDebugWin()
 showPanel(mainFrame)
