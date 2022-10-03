@@ -6,6 +6,8 @@ import caesarCipher, pickle, csv, uuid
 
 # Modifying admin user details
 def adminCreate(): #Allows the admin to add a new admin user
+    print("")
+    print("Create a new admin user")
     adminName = input("Admin Name: ")
     adminPassword = input("Password: ")
     if confirm():
@@ -78,30 +80,63 @@ def adminUpdate(): #Allows the admin to update an existing admin profile
         with open("Data/cred.dat", 'wb') as f: #Writing back all the records including the modified one
             for i in l:
                 pickle.dump(i, f)
-        print(l)
     else:
         print("Aborting...")
 
 # Modifying voters' list
 def voterAdd(): #To add a record to voterList.csv and update voterList.dat with a new UUID accordingly
+    genders = ["M", "F", "Other"]
+    correct = {"addVoterName":(1,"No error"), "addVoterAge":(1,"No error"), "addVoterSex":(1,"No error"), "addVoterID":(1,"No error")}
     addVoterName = input("Enter voter name to add to list: ")
     addVoterAge = input(f"Enter {addVoterName}'s age: ")
-    addVoterSex = input(f"Enter {addVoterName}'s gender: ")
-    addVoterUUID = str(uuid.uuid4()).split("-")[0]
+    addVoterSex = input(f"Enter {addVoterName}'s gender (M/F/Other): ")
+    addVoterID = str(uuid.uuid4()).split("-")[0]
+    errorDetails = []
+    
+    try:
+        if addVoterName == "":
+            correct["addCandidateName"] = (0,"Invalid Name! Candidate name cannot be empty")
 
-    if confirm():
-        with open("Data/voterList.csv", "a") as f:
-            writer = csv.writer(f)
-            writer.writerow([addVoterUUID,addVoterName,addVoterAge,addVoterSex,'N'])
+        if int(addVoterAge) >= 18:
+            pass
+        else:
+            correct["addVoterAge"] = (0, "Invalid Age! Voter must be above 18 years")
 
-        print(f"Successfully added {addVoterName}'s details into the voters' database!")
+        if addVoterSex in genders:
+            pass
+        else:
+            correct["addVoterSex"] = (0, "Invalid Gender! Please choose from the following: (M/F/Other)")
+        
+        with open("Data/voterList.csv", "r", newline="") as f:
+            ro = csv.reader(f) 
+            for i in ro:
+                if i[0] == addVoterID:
+                    correct["addVoterID"] = (0, "Voter ID generation failed! Please re-attempt")
+                    break
+    except:
+        print("Some error occured, try again!")
+        return
+    
+    for i in correct:
+        if correct[i][0] == 0:
+            errorDetails.append(f"{correct[i][1]}")
+
+    if errorDetails == []:
+        if confirm():
+            with open("Data/voterList.csv", "a", encoding = 'utf8', newline="") as f:
+                writer = csv.writer(f)
+                writer.writerow([addVoterID,addVoterName,addVoterAge,addVoterSex,'N'])
+            print(f"Successfully added {addVoterName}'s details into the voters' database!")
+        else:
+            print("Aborting")
     else:
-        print("Aborting")
+        print("Error while adding voter to database! Reason:")
+        for i in errorDetails:
+            print(f"{errorDetails.index(i)+1}. {i}")
 
 def voterDelete(): #To delete a record from voterList.csv and voterList.dat
     found = False
-
-    delVoterUUID = input("Enter voter's UUID to delete from the database: ")
+    delVoterID = input("Enter voter's ID to delete from the database: ")
 
     if confirm():
 
@@ -109,9 +144,9 @@ def voterDelete(): #To delete a record from voterList.csv and voterList.dat
 
         data = fetchVoters()
         for i in data:
-            if i[0] == delVoterUUID: #Storing all records except the record to delete
+            if i[0] == delVoterID: #Storing all records except the record to delete
                 found = True
-                print("Deleted {delVoterUUID}'s details from the database!")
+                print(f"Deleted {delVoterID}'s details from the database!")
                 continue
             l.append(i)
         
@@ -119,7 +154,7 @@ def voterDelete(): #To delete a record from voterList.csv and voterList.dat
             print("No such voter exists in the database!")
             return
 
-        with open("Data/voterList.csv", "w") as f: #Writing all the records except the record to delete
+        with open("Data/voterList.csv", "w", newline="") as f: #Writing all the records except the record to delete
             writer = csv.writer(f)
             writer.writerows(l)
     else:
@@ -127,20 +162,62 @@ def voterDelete(): #To delete a record from voterList.csv and voterList.dat
 
 # Modifying candidates' list
 def candidateAdd(): #Adds details of a NEW CANDIDATE into candidateList.csv
+    genders = ["M", "F", "Other"]
+    correct = {"addCandidateName":(1,"No error"), "addCandidateAge":(1,"No error"), "addCandidateSex":(1,"No error"), "addCandidateSymbol":(1,"No error"), "addCandidateAbout":(1,"No error"), "addCandidateID":(1,"No error")}
     addCandidateName = input("Enter candidate name to add to list: ")
     addCandidateAge = input(f"Enter {addCandidateName}'s age: ")
-    addCandidateSex = input(f"Enter {addCandidateName}'s gender: ")
+    addCandidateSex = input(f"Enter {addCandidateName}'s gender (M/F/Other): ")
     addCandidateSymbol = input(f"Enter {addCandidateName}'s symbol: ")
     addCandidateAbout = input(f"Enter {addCandidateName}'s description: ")
     addCandidateID = str(uuid.uuid4()).split("-")[0]
+    errorDetails = []
     
-    if confirm():
-        with open("Data/candidateList.csv", "a", encoding = 'utf8') as f:
-            writer = csv.writer(f)
-            writer.writerow([addCandidateID,addCandidateName,addCandidateAge,addCandidateSex,addCandidateSymbol,addCandidateAbout])
-        print(f"Successfully added {addCandidateName}'s details into the records")
+    try:
+        if addCandidateName == "":
+            correct["addCandidateName"] = (0,"Invalid Name! Candidate name cannot be empty")
+
+        if int(addCandidateAge) >= 18:
+            pass
+        else:
+            correct["addCandidateAge"] = (0, "Invalid Age! Candidate must be above 18 years")
+
+        if addCandidateSex in genders:
+            pass
+        else:
+            correct["addCandidateSex"] = (0, "Invalid Gender! Please choose from the following: (M/F/Other)")
+
+        with open("Data/candidateList.csv", "r", newline="") as f:
+            ro = csv.reader(f) 
+            for i in ro:
+                if i[4] == addCandidateSymbol:
+                    correct["addCandidateSymbol"] = (0, "Invalid symbol! Symbol already in use by another candidate")
+                    break
+        
+        with open("Data/candidateList.csv", "r", newline="") as f:
+            ro = csv.reader(f) 
+            for i in ro:
+                if i[0] == addCandidateID:
+                    correct["addCandidateID"] = (0, "Candidate ID generation failed! Please re-attempt")
+                    break
+    except:
+        print("Some error occured, try again!")
+        return
+
+    for i in correct:
+        if correct[i][0] == 0:
+            errorDetails.append(f"{correct[i][1]}")
+    if errorDetails == []:
+        if confirm():
+            with open("Data/candidateList.csv", "a", encoding = 'utf8', newline="") as f:
+                writer = csv.writer(f)
+                writer.writerow([addCandidateID,addCandidateName,addCandidateAge,addCandidateSex, addCandidateSymbol,addCandidateAbout])
+            print(f"Successfully added {addCandidateName}'s details into the records")
+        else:
+            print("Aborting...")
     else:
-        print("Aborting...")
+        print("Error while adding Candidate to database! Reason:")
+        for i in errorDetails:
+            print(f"{errorDetails.index(i)+1}. {i}")
 
 def candidateDelete(): #Deletes details of an existing CANDIDATE from candidateList.csv
     delCandidateID = input("Enter the Candidate's ID to be deleted: ")
@@ -155,7 +232,7 @@ def candidateDelete(): #Deletes details of an existing CANDIDATE from candidateL
                 continue
             l.append(i)
 
-        with open("Data/candidateList.csv", 'w', encoding = 'utf8') as f: #Writing all the records except the one to be deleted
+        with open("Data/candidateList.csv", 'w', encoding = 'utf8', newline="") as f: #Writing all the records except the one to be deleted
             writer = csv.writer(f)
             writer.writerows(l)
     else:
