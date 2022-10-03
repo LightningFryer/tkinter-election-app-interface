@@ -2,50 +2,41 @@
 import pickle, csv
 from prettytable import PrettyTable
 
+#----------------------------------------------------------Misc-----------------------------------------------------------
+
 def elecPrompt(): #Prompt to accept name and UID of VOTERS
     name = input("Name: ")
     UID = input("UID: ")
     return name, UID
 
-def confirm():
+def confirm(): #Prompt to confirm user choice
     confirmation = input("Are you sure?(y/n): ")
     if confirmation.lower() == "y":
         return True
     else:
         return False
-
+#^--------------------------------------------------------^Misc^---------------------------------------------------------^
 #----------------------------------------------------Fetching records-----------------------------------------------------
 
 def fetchCandidates():
     data = []
-    with open("Data/candidateList.csv", 'r', encoding = 'utf8') as f:
+    with open("Data/candidateList.csv", 'r', encoding = 'utf8', newline="") as f:
         reader = csv.reader(f)
         for i in reader:
             data.append(i)
     return data
 
-def fetchVotersCSV():
+def fetchVoters():
     data = []
-    with open("Election App/Data/voterList.csv", 'r') as f:
+    with open("Data/voterList.csv", 'r', newline="") as f:
         reader = csv.reader(f)
         for i in reader:
             data.append(i)
     return data
-
-def fetchVotersBIN():
-    data = []
-    f = open("Data/voterList.dat", 'rb')
-    try:
-        while True:
-            i = pickle.load(f)
-            data.append(i)
-    except EOFError:
-        f.close()
-    return data
-
+    
 def fetchSettings(sessionID=None):
     if sessionID is None:
-        settingsFile = open("Election App/Data/settings.dat", "rb")
+        settingsFile = open("Data/settings.dat", "rb")
         settingsList = []
         try:
             while True:
@@ -55,7 +46,7 @@ def fetchSettings(sessionID=None):
             settingsFile.close()
         return settingsList
     else:
-        settingsFile = open("Election App/Data/settings.dat", "rb")
+        settingsFile = open("Data/settings.dat", "rb")
         try:
             while True:
                 settings = pickle.load(settingsFile)
@@ -67,7 +58,7 @@ def fetchSettings(sessionID=None):
             settingsFile.close()
 
 def fetchAdminUsers():
-    credFile = open("Election App/Data/cred.dat", "rb")
+    credFile = open("Data/cred.dat", "rb")
     adminUsers = []
     try:
         while True:
@@ -80,34 +71,23 @@ def fetchAdminUsers():
 #^--------------------------------------------------^Fetching records^---------------------------------------------------^
 #---------------------------------------------------Displaying records----------------------------------------------------
 
-def display_candidates_debug():
-    data = fetchCandidates()
-    for i in data: print(i)
-
-def display_candidates(): #Displays the candidates details for the voters to see using prettytable  
-    candidateTable = PrettyTable(["ID","Name","Age","Sex","Symbol","About"]) #Creates a table with headers from the csv file.
-    
+def displayCandidates(): #Displays the candidates details for the voters to see using prettytable  
     candidateData = fetchCandidates()
     
-    for row in candidateData:
-        if row[4] != "Symbol": 
-            candidateTable.add_row([row[0],row[1],row[2],row[3],row[4],row[5]]) #Adds rows into candidateTable one by one
+    candidateTable = PrettyTable(candidateData[0]) #Creates a table with headers from the csv file.
     
-    return candidateTable
-
-def display_voters_debug(): #Displays the voter details for the admin to see using prettytable  
-    data = fetchVotersBIN()
-    for i in data: print(i)
-
-    # Need to modify pretty table code to make use of data from binary file 
-    # voterTable = PrettyTable(["Name","Age","Sex"]) #Creates a table with headers from the csv file. 
-
-    # voterData = fetchVotersCSV()
+    for row in candidateData[1:]:
+        candidateTable.add_row([row[0],row[1],row[2],row[3],row[4],row[5]]) #Adds rows into candidateTable one by one
     
-    # for row in voterData:
-    #     if row[1] != "Age": 
-    #         voterTable.add_row([row[0],row[1],row[2]]) #Adds rows into voterTable one by one
-    
-    # return voterTable
+    print(candidateTable)
 
-#^-------------------------------------------------^Displaying records^--------------------------------------------------^
+def displayVoters(): #Displays the voter details for the admin to see using prettytable  
+    voterData = fetchVoters()
+
+    voterTable = PrettyTable(voterData[0]) #Creates a table with headers from the csv file. 
+    
+    for row in voterData[1:]:
+        voterTable.add_row([row[0],row[1],row[2],row[3],row[4]]) #Adds rows into voterTable one by one
+    
+    print(voterTable)
+#^-------------------------------------------------^Displaying records^--------------------------------------------------^    
