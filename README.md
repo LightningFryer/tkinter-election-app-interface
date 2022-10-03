@@ -3,6 +3,28 @@ Using the Election App code meant for the console and porting it over to a tkint
 
 You seriously didn't think that people would vote through a console, did you?
 
+# Status: In development
+
+✅ - Everything works perfectly
+
+✖️ - Partially Works
+
+❌ - Just for show/Does not work
+
+User Landing Panel - ✅
+
+Admin Landing Panel - ✅
+
+Voter Configuration Panel - ✅
+
+Candidate Configuration Panel - ✅
+
+Admin Configuration Panel - ✅
+
+Setup Voting Session Panel - ❌
+
+Start Voting Session Panel - ❌
+
 # Screenshots
 ![image](https://user-images.githubusercontent.com/91123163/189565463-76023847-3752-4b48-a411-e6fadb8c9676.png)
 
