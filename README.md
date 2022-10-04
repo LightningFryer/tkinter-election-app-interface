@@ -21,7 +21,7 @@ Candidate Configuration Panel - ✅
 
 Admin Configuration Panel - ✅
 
-Setup Voting Session Panel - ❌
+Setup Voting Session Panel - ✅
 
 Start Voting Session Panel - ❌
 
