@@ -1,131 +1,100 @@
 # imports
-import helper
-import eAuth
-import modify
-import election
+import pickle, csv
+from prettytable import PrettyTable
 
-#--------------------------------------------------------Global Vars--------------------------------------------------------
+#----------------------------------------------------------Misc-----------------------------------------------------------
 
-voteCount = []
+def elecPrompt(): #Prompt to accept name and UID of VOTERS
+    name = input("Name: ")
+    UID = input("UID: ")
+    return name, UID
 
-#--------------------------------------------------------Main Code--------------------------------------------------------
-while True: #Main code starts here
-    if helper.fetchAdminUsers() != []: #Check for existing admin user
-        lg = eAuth.adminLogin()
-        if lg[0]:
-            while True:
-                print("")
-                print("1. Voters' List")
-                print("2. Candidates' List")
-                print("3. Admin Settings")
-                print("4. Setup Voting Session")
-                print("5. Start Voting Session")
-                print("6. Logout")
-                print("7. Close Program")
-
-                try:
-                    mainOp = input("Enter your choice: ")
-                except:
-                    print("Invalid Choice")
-                    continue
-                #Voters' List related operations
-                if mainOp == "1":
-                    while True:
-                        subOp = election.subMenu() #Gets sub operation from this function
-                        if subOp == "1": 
-                            modify.voterAdd()
-
-                        elif subOp == "2": 
-                            modify.voterDelete()
-
-                        elif subOp == "3": 
-                            helper.displayVoters()
-                        
-                        elif subOp == "4":
-                            print("Returning to main menu...")
-                            break
-                        else:
-                            print("Invalid sub-operation!")
-
-                #Candidates' List related operations
-                elif mainOp == "2": 
-                    while True:
-                        subOp = election.subMenu() #Gets sub operation from this function
-                        if subOp == "1": 
-                            modify.candidateAdd()
-
-                        elif subOp == "2":
-                            modify.candidateDelete()
-                        
-                        elif subOp == "3":
-                            helper.displayCandidates()
-                            
-                        elif subOp == "4":
-                            print("Returning to main menu...")
-                            break
-                        else:
-                            print("Invalid sub-operation!")
-                
-                #Admin related operations
-                elif mainOp == "3": 
-                    while True:
-                        subOp = election.subMenuAdmin() #Gets sub operation for admin operations from this function
-                        if subOp == "1": 
-                            modify.adminCreate()
-                        
-                        elif subOp == "2":
-                            modify.adminDelete()
-                        
-                        elif subOp == "3": 
-                            helper.adminUpdate()
-
-                        elif subOp == "4":
-                            print("Returning to main menu...")
-                            break
-                        else:
-                            print("Invalid sub-operation!")
-                #Election settings
-                elif mainOp == "4": 
-                    allSettings = helper.fetchSettings() 
-                    helper.displayAllSettings() #Displays settings of all sessions using PrettyTable
-                    election.elecSettings(lg[1])
-                
-                #Election session
-                elif mainOp == "5":
-                    helper.displayAllSettings() #Displays settings of all sessions using PrettyTable
-                    
-                    sessionID = input("Session ID: ")
-                    if helper.confirm():
-                        settings = helper.fetchSettings(sessionID)
-                        while True:
-                            reply = election.elecSess(sessionID, settings, voteCount)
-                            if reply[0]:
-                                voteCount = reply[1]
-                                continue
-                            elif reply[2]:
-                                continue
-                            else:
-                                election.saveSession(sessionID, voteCount)
-                                print("Session saved...")
-                                print("Exiting session")
-                                break
-                    else:
-                        continue
-                #Logout
-                elif mainOp == "6":
-                    break
-
-                #Terminating instance
-                elif mainOp == "7":
-                    print("Terminating instance...")
-                    print("Thank you for using Election App!")
-                    exit()           
-                
-                else:
-                    print("Invalid Operation!")
-        else:
-            print("Invalid Admin Details!")
-    
+def confirm(): #Prompt to confirm user choice
+    confirmation = input("Are you sure?(y/n): ")
+    if confirmation.lower() == "y":
+        return True
     else:
-        modify.adminCreate() #Prompt to create a new admin user if no pre-existing admin user is found
-#^------------------------------------------------------^Main Code^------------------------------------------------------^
+        return False
+#^--------------------------------------------------------^Misc^---------------------------------------------------------^
+#----------------------------------------------------Fetching records-----------------------------------------------------
+
+def fetchCandidates():
+    data = []
+    with open("Data/candidateList.csv", 'r', encoding = 'utf8', newline="") as f:
+        reader = csv.reader(f)
+        for i in reader:
+            data.append(i)
+    return data
+
+def fetchVoters():
+    data = []
+    with open("Data/voterList.csv", 'r', newline="") as f:
+        reader = csv.reader(f)
+        for i in reader:
+            data.append(i)
+    return data
+    
+def fetchSettings(sessionID=None):
+    if sessionID is None:
+        settingsFile = open("Data/settings.dat", "rb")
+        settingsList = []
+        try:
+            while True:
+                settings = pickle.load(settingsFile)
+                settingsList.append(settings)
+        except EOFError:
+            settingsFile.close()
+        return settingsList
+    else:
+        settingsFile = open("Data/settings.dat", "rb")
+        try:
+            while True:
+                settings = pickle.load(settingsFile)
+                if settings["Session ID"] == sessionID:
+                    print("Session found!")
+                    return settings
+        except EOFError:
+            print("No such session exists!")
+            settingsFile.close()
+
+def displayAllSettings():
+    allSettings = fetchSettings()
+    allSettingsTable = PrettyTable(["Session ID", "Time", "Election Officer", "Post", "Booth Number"])
+    for i in allSettings:
+        allSettingsTable.add_row([i["Session ID"], i["Time"], i["Election Officer"], i["Post"], i["Booth Number"]])
+    print(allSettingsTable)
+
+def fetchAdminUsers():
+    credFile = open("Data/cred.dat", "rb")
+    adminUsers = []
+    try:
+        while True:
+            adminUser = pickle.load(credFile)
+            adminUsers.append(adminUser)
+    except EOFError:
+        credFile.close()
+    return adminUsers
+
+#^--------------------------------------------------^Fetching records^---------------------------------------------------^
+#---------------------------------------------------Displaying records----------------------------------------------------
+
+def displayCandidates(): #Displays the candidates details for the voters to see using prettytable  
+    candidateData = fetchCandidates()
+    
+    candidateTable = PrettyTable(candidateData[0]) #Creates a table with headers from the csv file.
+    
+    for row in candidateData[1:]:
+        candidateTable.add_row([row[0],row[1],row[2],row[3],row[4],row[5]]) #Adds rows into candidateTable one by one
+    
+    print(candidateTable)
+
+def displayVoters(): #Displays the voter details for the admin to see using prettytable  
+    voterData = fetchVoters()
+
+    voterTable = PrettyTable(voterData[0]) #Creates a table with headers from the csv file. 
+    
+    for row in voterData[1:]:
+        voterTable.add_row([row[0],row[1],row[2],row[3],row[4]]) #Adds rows into voterTable one by one
+    
+    print(voterTable)
+#^-------------------------------------------------^Displaying records^--------------------------------------------------^    
