@@ -283,7 +283,9 @@ def adminAddSubmit(event = None):
     if response == 1:
         with open("Data/cred.dat", "ab") as f: #Dumping the new admin's data
             pickle.dump(cred, f)
-        messagebox.showinfo(title="Success!", message="Successfully added details of Admin to Database!")
+        messagebox.showinfo(title="Success!", message="Successfully added details of Admin to Database! You will now be sent back to login page to confirm this change.")
+        hidePanel(adminAddFrame)
+        showPanel(mainFrame)
 
 def adminDelSubmit(event = None):
     adminName = adminNameData.get()
@@ -344,7 +346,7 @@ def adminUpdateSubmit():
         for i in l:
             pickle.dump(i, f)
 
-def setVoteSessSubmit(admin = adminNameData.get()):
+def setVoteSessSubmit():
     sessionID = str(uuid.uuid4()).split("-")[0]
     post = elecPostData.get()
     boothNo = boothNumData.get()
@@ -354,7 +356,7 @@ def setVoteSessSubmit(admin = adminNameData.get()):
         voteCount = [["Candidate ID", "Candidate Name", "Votes"]]
         settingsFile = open("Data/settings.dat", "ab")
         timeStamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        settings = {"Session ID":sessionID, "Time": timeStamp, "Election Officer":admin, "Post":post, "Booth Number":boothNo}
+        settings = {"Session ID":sessionID, "Time": timeStamp, "Election Officer":adminNameData.get(), "Post":post, "Booth Number":boothNo}
         pickle.dump(settings,settingsFile)
 
         for i in helper.fetchCandidates()[1:]:
@@ -744,7 +746,16 @@ fromSetVoteSessBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
 setVoteSessFrame.pack_forget()
 
+#Start Voting Session
+startVoteSessFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
+
 openDebugWin()
-showPanel(mainFrame)
+
+if fetchAdminUsers() == []:
+    fromAdminAddBtn.grid_forget()
+    showPanel(adminAddFrame)
+else:
+    showPanel(mainFrame)
+
 root.bind("<Return>", submitOnClick)
 root.mainloop()
