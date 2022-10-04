@@ -46,6 +46,8 @@ candDelData = StringVar()
 adminNameData = StringVar()
 adminPassData = StringVar()
 adminNewPassData = StringVar()
+elecPostData = StringVar()
+boothNumData = StringVar()
 genderData.set(genders[0])
 
 #Voter/Candidate Lists 
@@ -114,14 +116,66 @@ def showCandList():
         if candListData[i] != []:
             Label(canvasFrame, text=f"ID: {candListData[i][0]}   Name: {candListData[i][1]}   Age: {candListData[i][2]}   Sex: {candListData[i][3]}   Symbol: {candListData[i][4]}", font="mont").grid(row=i+1, column=0, sticky=W)
 
+def showVoteSessList():
+    hidePanel(setVoteSessFrame)
+    global ListFrame, voteSessData
+    ListFrame = ttk.Frame(root)
+    ListFrame.grid(row=0, column=0, sticky=NSEW, ipadx=200)
+    ListFrame.grid_rowconfigure(0, weight=1)
+    ListFrame.grid_columnconfigure(0, weight=1)
+
+    ListCanvas = Canvas(ListFrame)
+    ListCanvas.grid(row=0, column=0, sticky=NSEW+W, ipady=130)
+    ListCanvas.grid_rowconfigure(0, weight=1)
+    ListCanvas.grid_columnconfigure(0, weight=1)
+
+    scroll = ttk.Scrollbar(ListFrame, orient=VERTICAL, command= ListCanvas.yview)
+    scroll.grid(sticky=NS+E, column=1, row=0)
+
+    ListCanvas.configure(yscrollcommand=scroll.set)
+    ListCanvas.bind("<Configure>", lambda e: ListCanvas.configure(scrollregion=ListCanvas.bbox("all")))
+
+    canvasFrame = ttk.Frame(ListCanvas)
+    ListCanvas.create_window((0,0), window=canvasFrame, anchor=NW)
+    voteSessData = fetchSettings()
+
+    fromVoteSessListBtn = ttk.Button(ListFrame, text="< Back", style="my.TButton", command=fromVoteSessList)
+    ListSep = ttk.Separator(ListFrame)
+    fromVoteSessListBtn.grid(row=2, padx=(7,0), columnspan=2, pady=(15,0))
+    ListSep.grid(row=1, columnspan=2, sticky=EW, ipady=2)
+    errorLabel = Label(canvasFrame, text="No sessions exist as of now. Details of any sessions you create are shown here.\n Please create a session from the previous panel.", font="mont", justify=CENTER)
+
+    if voteSessData == []:
+        errorLabel.grid(row=0, column=0, padx=(90,0), pady=(250,0))
+    else:
+        errorLabel.grid_forget()
+        sessIDHead = ttk.Label(canvasFrame, text="Session ID", font="mont")
+        sessTimeHead = ttk.Label(canvasFrame, text="Time", font="mont")
+        sessElecOffhead = ttk.Label(canvasFrame, text="Election Officer", font="mont")
+        sessPostHead = ttk.Label(canvasFrame, text="Post", font="mont")
+        sessBoothHead = ttk.Label(canvasFrame, text="Booth Number", font="mont")
+
+        sessIDHead.grid(row=0, column=0, padx=(30,0), pady=(10,10))
+        sessTimeHead.grid(row=0, column=1, padx=(30,0), pady=(10,10))
+        sessElecOffhead.grid(row=0, column=2, padx=(30,0), pady=(10,10))
+        sessPostHead.grid(row=0, column=3, padx=(30,0), pady=(10,10))
+        sessBoothHead.grid(row=0, column=4, pady=(10,10), padx=(30,0))
+
+        for i in range(len(voteSessData)):
+            Label(canvasFrame, text=f"{voteSessData[i]['Session ID']}", font="mont").grid(row=i+1, column=0, padx=(30,0))
+            Label(canvasFrame, text=f"{voteSessData[i]['Time']}", font="mont").grid(row=i+1, column=1, padx=(30,0))
+            Label(canvasFrame, text=f"{voteSessData[i]['Election Officer']}", font="mont").grid(row=i+1, column=2, padx=(30,0))
+            Label(canvasFrame, text=f"{voteSessData[i]['Post']}", font="mont").grid(row=i+1, column=3, padx=(30,0))
+            Label(canvasFrame, text=f"{voteSessData[i]['Booth Number']}", font="mont").grid(row=i+1, column=4, padx=(15,0)) 
+
 #Debug Window
 def openDebugWin():
     global btnstyle
     global debugWin
     debugWin = Toplevel()
     debugWin.title("Debug Operations")
-    consoleVoterListBtn = ttk.Button(debugWin, text="Voter List", command=fetchVotersDebug, style="my.TButton").grid(row=0, column=0, padx=15, ipadx=35, pady=15)
-    consoleCandidateListBtn = ttk.Button(debugWin, text="Candidate List", command=fetchCandidatesDebug, style="my.TButton").grid(row=1, column=0, ipadx=30, pady=15)
+    consoleVoterListBtn = ttk.Button(debugWin, text="Voter List", command=fetchVoters, style="my.TButton").grid(row=0, column=0, padx=15, ipadx=35, pady=15)
+    consoleCandidateListBtn = ttk.Button(debugWin, text="Candidate List", command=fetchCandidates, style="my.TButton").grid(row=1, column=0, ipadx=30, pady=15)
     autoLogin = ttk.Button(debugWin, text="Admin Login", command=openAdminWin, style="my.TButton").grid(row=2, column=0, padx=15, pady=15, ipadx=35,)
     testList = ttk.Button(debugWin, text="Test List", command=showVoterList, style="my.TButton").grid(row=3, column=0, padx=15, pady=15)
 
@@ -290,6 +344,28 @@ def adminUpdateSubmit():
         for i in l:
             pickle.dump(i, f)
 
+def setVoteSessSubmit(admin = adminNameData.get()):
+    sessionID = str(uuid.uuid4()).split("-")[0]
+    post = elecPostData.get()
+    boothNo = boothNumData.get()
+    response = messagebox.askyesno(title="Confirmation", message="Are you sure you want to create a new Voting Session?")
+    
+    if response == 1:
+        voteCount = [["Candidate ID", "Candidate Name", "Votes"]]
+        settingsFile = open("Data/settings.dat", "ab")
+        timeStamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        settings = {"Session ID":sessionID, "Time": timeStamp, "Election Officer":admin, "Post":post, "Booth Number":boothNo}
+        pickle.dump(settings,settingsFile)
+
+        for i in helper.fetchCandidates()[1:]:
+            voteCount.append([i[0],i[1],0])
+
+        with open(f"Data/voteCount-{sessionID}.csv", "a", newline="") as voteCountFile:
+            w_o = csv.writer(voteCountFile)
+            w_o.writerows(voteCount)
+
+        messagebox.showinfo(title="Success!", message="Successfully created new voting session!")
+
 #Show/Hide Panel Commands
 def showPanel(frameName):
     frameName.pack(fill=BOTH, expand=True, padx=10, pady=10)
@@ -349,6 +425,10 @@ def openAdminUpdateWin():
     hidePanel(adminSettingsFrame)
     showPanel(adminUpdateFrame)
 
+def openSetVoteSessWin():
+    hidePanel(adminFrame)
+    showPanel(setVoteSessFrame)
+
 #Close/Hide Windows
 def fromAdminSettings():
     hidePanel(adminSettingsFrame)
@@ -398,6 +478,14 @@ def fromAdminUpdate():
     hidePanel(adminUpdateFrame)
     showPanel(adminSettingsFrame)
 
+def fromSetVoteSess():
+    hidePanel(setVoteSessFrame)
+    showPanel(adminFrame)
+
+def fromVoteSessList():
+    hidePanel(ListFrame)
+    showPanel(setVoteSessFrame)
+
 def adminLogout():
     hidePanel(adminFrame)
     showPanel(mainFrame)
@@ -426,7 +514,7 @@ adminWinLabel = ttk.Label(adminFrame, text="Welcome Admin", font="mont")
 adminLabelSep = ttk.Separator(adminFrame)
 voterOpBtn = ttk.Button(adminFrame, text="Configure Voters' List", style="my.TButton", command=openVoterConfigWin)
 candidateOpBtn = ttk.Button(adminFrame, text="Configure Candidates' List", style="my.TButton", command=openCandWin)
-setVoteSessionBtn = ttk.Button(adminFrame, text="Setup Voting Session", style="my.TButton")
+setVoteSessionBtn = ttk.Button(adminFrame, text="Setup Voting Session", style="my.TButton", command=openSetVoteSessWin)
 startVoterSessionBtn = ttk.Button(adminFrame, text="Start a Voting Session", style="my.TButton", padding=(25,3,25,3))
 adminSettingBtn = ttk.Button(adminFrame, text="Admin Settings", style="my.TButton", command=openAdminSettingsWin)
 adminLogoutBtn = ttk.Button(adminFrame, text="Logout", style="my.TButton", padding=(20,3,20,3), command=adminLogout)
@@ -525,14 +613,14 @@ voterConfigLabel = ttk.Label(voterConfigFrame, text="Voter Configuration", font=
 voterConfigLabelSep = ttk.Separator(voterConfigFrame)
 addAVoterRecord = ttk.Button(voterConfigFrame, text="Add a new voter record", style="my.TButton", command=openVoterAddWin)
 delAVoterRecord = ttk.Button(voterConfigFrame, text="Delete a voter record", style="my.TButton", command=openVoterDelWin)
-displayVoters = ttk.Button(voterConfigFrame, text="Display Voter List", style="my.TButton", command=showVoterList)
+displayVoters_ = ttk.Button(voterConfigFrame, text="Display Voter List", style="my.TButton", command=showVoterList)
 fromVoterConfigBtn = ttk.Button(voterConfigFrame, text="< Back", style="my.TButton", command=fromVoterConfig)
 
 voterConfigLabel.grid(row=1, column=0, columnspan=2, pady=(170,0), padx=(150,0))
 voterConfigLabelSep.grid(row=2, column=0, ipady=2, sticky=EW, columnspan=2, padx=(130,0), pady=(10,10))
 addAVoterRecord.grid(row=3, column=0, padx=(130,5), ipadx=20, pady=(0,10))
 delAVoterRecord.grid(row=3, column=1, padx=(5,0), ipadx=25, pady=(0,10))
-displayVoters.grid(row=4, column=0, columnspan=2, padx=(100,0), ipadx=25)
+displayVoters_.grid(row=4, column=0, columnspan=2, padx=(100,0), ipadx=25)
 fromVoterConfigBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
 voterConfigFrame.pack_forget()
@@ -635,6 +723,26 @@ candDelSubmitBtn.grid(row=2, column=0, columnspan=2, padx=(200,0), pady=(20,0), 
 fromCandDelBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
 
 candDelFrame.pack_forget()
+
+#Setup Voting Session Panel
+setVoteSessFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
+elecPostSessLabel = ttk.Label(setVoteSessFrame, text="Post of Election:", font="mont")
+elecPostSessEntry = ttk.Entry(setVoteSessFrame, textvariable=elecPostData, font="mont")
+boothNumLabel = ttk.Label(setVoteSessFrame, text="Enter Booth Number:", font="mont")
+boothNumEntry = ttk.Entry(setVoteSessFrame, textvariable=boothNumData, font="mont")
+setVoteSessSubmitBtn = ttk.Button(setVoteSessFrame, text="Submit", style="my.TButton", command=setVoteSessSubmit)
+showVoteSessBtn = ttk.Button(setVoteSessFrame, text="Show Sessions", style="my.TButton", command=showVoteSessList)
+fromSetVoteSessBtn = ttk.Button(setVoteSessFrame, text="< Back", style="my.TButton", command=fromSetVoteSess)
+
+elecPostSessLabel.grid(row=1, column=0, sticky=W, padx=(200,10), pady=(175,10))
+elecPostSessEntry.grid(row=1, column=1, pady=(175,10))
+boothNumLabel.grid(row=2, column=0, sticky=W, padx=(200,10), pady=(0,20))
+boothNumEntry.grid(row=2, column=1, pady=(0,20))
+showVoteSessBtn.grid(row=3, column=0, padx=(200,10), sticky=EW, ipadx=30)
+setVoteSessSubmitBtn.grid(row=3, column=1, sticky=EW)
+fromSetVoteSessBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
+
+setVoteSessFrame.pack_forget()
 
 openDebugWin()
 showPanel(mainFrame)
