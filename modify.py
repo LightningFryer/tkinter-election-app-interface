@@ -1,5 +1,5 @@
 # imports
-from helper import *
+import helper
 import caesarCipher, pickle, csv, uuid
 
 #----------------------------------------------------Modifying records----------------------------------------------------
@@ -10,7 +10,7 @@ def adminCreate(): #Allows the admin to add a new admin user
     print("Create a new admin user")
     adminName = input("Admin Name: ")
     adminPassword = input("Password: ")
-    if confirm():
+    if helper.confirm():
         cred = {"Admin Name":caesarCipher.caesarEncrypt(adminName), "Password":caesarCipher.caesarEncrypt(adminPassword)} #Dictionary containing new admin details to be dumped
 
         with open("Data/cred.dat", "ab") as f: #Dumping the new admin's data
@@ -24,7 +24,7 @@ def adminDelete(): #Allows the admin to delete an existing admin profile
     adminName = input("Enter Admin Name: ")
     adminPassword = input("Enter Admin Password: ")
     
-    if confirm():
+    if helper.confirm():
         f = open("Data/cred.dat", "rb")
         l = [] #Records to be rewritten are stored in this list
         found = False
@@ -55,7 +55,7 @@ def adminUpdate(): #Allows the admin to update an existing admin profile
     adminName = input("Admin Name: ")
     adminPassword = input("Password: ")
     found = False
-    if confirm():
+    if helper.confirm():
         f = open("Data/cred.dat", "rb")
         l = [] #Records to be rewritten are stored in this list
         try: #Searching for the record to be modified
@@ -122,7 +122,7 @@ def voterAdd(): #To add a record to voterList.csv and update voterList.dat with 
             errorDetails.append(f"{correct[i][1]}")
 
     if errorDetails == []:
-        if confirm():
+        if helper.confirm():
             with open("Data/voterList.csv", "a", encoding = 'utf8', newline="") as f:
                 writer = csv.writer(f)
                 writer.writerow([addVoterID,addVoterName,addVoterAge,addVoterSex,'N'])
@@ -138,11 +138,11 @@ def voterDelete(): #To delete a record from voterList.csv and voterList.dat
     found = False
     delVoterID = input("Enter voter's ID to delete from the database: ")
 
-    if confirm():
+    if helper.confirm():
 
         l = [] #Records to be rewritten are stored in this list
 
-        data = fetchVoters()
+        data = helper.fetchVoters()
         for i in data:
             if i[0] == delVoterID: #Storing all records except the record to delete
                 found = True
@@ -207,7 +207,7 @@ def candidateAdd(): #Adds details of a NEW CANDIDATE into candidateList.csv
         if correct[i][0] == 0:
             errorDetails.append(f"{correct[i][1]}")
     if errorDetails == []:
-        if confirm():
+        if helper.confirm():
             with open("Data/candidateList.csv", "a", encoding = 'utf8', newline="") as f:
                 writer = csv.writer(f)
                 writer.writerow([addCandidateID,addCandidateName,addCandidateAge,addCandidateSex, addCandidateSymbol,addCandidateAbout])
@@ -222,10 +222,10 @@ def candidateAdd(): #Adds details of a NEW CANDIDATE into candidateList.csv
 def candidateDelete(): #Deletes details of an existing CANDIDATE from candidateList.csv
     delCandidateID = input("Enter the Candidate's ID to be deleted: ")
 
-    if confirm():
+    if helper.confirm():
         l = [] #Records to be rewritten are stored in this list
 
-        data = fetchCandidates() 
+        data = helper.fetchCandidates() 
         for i in data:
             if i[0] == delCandidateID: #Storing all the records except the one to be deleted
                 print(f"Successfully deleted details of Candidate with ID {delCandidateID}")
