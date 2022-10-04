@@ -57,6 +57,13 @@ def fetchSettings(sessionID=None):
             print("No such session exists!")
             settingsFile.close()
 
+def displayAllSettings():
+    allSettings = fetchSettings()
+    allSettingsTable = PrettyTable(["Session ID", "Time", "Election Officer", "Post", "Booth Number"])
+    for i in allSettings:
+        allSettingsTable.add_row([i["Session ID"], i["Time"], i["Election Officer"], i["Post"], i["Booth Number"]])
+    print(allSettingsTable)
+
 def fetchAdminUsers():
     credFile = open("Data/cred.dat", "rb")
     adminUsers = []
