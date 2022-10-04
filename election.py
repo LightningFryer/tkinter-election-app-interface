@@ -39,7 +39,7 @@ def elecSettings(admin):
     if helper.confirm():
         voteCount = [["Candidate ID", "Candidate Name", "Votes"]]
         settingsFile = open("Data/settings.dat", "ab")
-        timeStamp = str(datetime.datetime.now())
+        timeStamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         settings = {"Session ID":sessionID, "Time": timeStamp, "Election Officer":admin, "Post":post, "Booth Number":boothNo}
         pickle.dump(settings,settingsFile)
         
