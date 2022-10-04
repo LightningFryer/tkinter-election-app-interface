@@ -356,7 +356,7 @@ def setVoteSessSubmit():
         voteCount = [["Candidate ID", "Candidate Name", "Votes"]]
         settingsFile = open("Data/settings.dat", "ab")
         timeStamp = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        settings = {"Session ID":sessionID, "Time": timeStamp, "Election Officer":adminNameData.get(), "Post":post, "Booth Number":boothNo}
+        settings = {"Session ID":sessionID, "Time": timeStamp, "Election Officer":nameData.get(), "Post":post, "Booth Number":boothNo}
         pickle.dump(settings,settingsFile)
 
         for i in helper.fetchCandidates()[1:]:
