@@ -1,6 +1,6 @@
 # imports
 import pickle, caesarCipher, csv
-from election import *
+import election
 #---------------------------------------------------------Logins----------------------------------------------------------
 
 def adminLogin(): #Admin login details check
@@ -33,7 +33,7 @@ def voterLogin(): #Checks whether the VOTER'S name and UID exists within the dat
     reader = csv.reader(f)
     
     for i in reader:
-        if ID == i[0] and name == i[1] and hasVoted(ID) == False:
+        if ID == i[0] and name == i[1] and election.hasVoted(ID) == False:
             f.close()
             return True
     f.close()
