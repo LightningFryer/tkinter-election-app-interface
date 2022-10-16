@@ -3,7 +3,7 @@ Using the Election App code meant for the console and porting it over to a tkint
 
 You seriously didn't think that people would vote through a console, did you?
 
-# Status: In development
+# Status: On hiatus
 
 ✅ - Everything works perfectly
 
