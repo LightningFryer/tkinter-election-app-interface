@@ -48,6 +48,7 @@ adminPassData = StringVar()
 adminNewPassData = StringVar()
 elecPostData = StringVar()
 boothNumData = StringVar()
+startVoteSessIDData = StringVar()
 genderData.set(genders[0])
 
 #Voter/Candidate Lists 
@@ -78,11 +79,32 @@ def showVoterList():
     fromVoterListBtn.grid(row=2, padx=(7,0), columnspan=2, pady=(15,0))
     voterListSep = ttk.Separator(ListFrame)
     voterListSep.grid(row=1, columnspan=2, sticky=EW, ipady=2)
+    errorLabel = Label(canvasFrame, text="No Voter details found in database.\nYou can create new Voter Details from the previous menu.", font="mont", justify=CENTER)
+    if voterListData == []:
+        errorLabel.grid(row=0, column=0, padx=(90,0), pady=(250,0))
+    else:
+        errorLabel.grid_forget()
+        voterIDLabel = ttk.Label(canvasFrame, text="ID", font="mont", justify=CENTER)
+        voterNameLabel = ttk.Label(canvasFrame, text="Name", font="mont", justify=CENTER)
+        voterAgeLabel = ttk.Label(canvasFrame, text="Age", font="mont", justify=CENTER)
+        voterSexLabel = ttk.Label(canvasFrame, text="Sex", font="mont", justify=CENTER)
+        voterVotedLabel = ttk.Label(canvasFrame,text="Voted?", font="mont", justify=CENTER)
 
-    for i in range(1,len(voterListData)):
-        if voterListData[i] != []:
-            Label(canvasFrame, text=f"ID: {voterListData[i][0]}", font="mont").grid(row=i+1, column=0, sticky=W, padx=(180,100))
-            Label(canvasFrame, text=f"Name: {voterListData[i][1]}", font="mont").grid(row=i+1, column=1, sticky=W)
+        voterIDLabel.grid(row=0, column=0, padx=(150,10))
+        voterNameLabel.grid(row=0, column=1, padx=(0,10))
+        voterAgeLabel.grid(row=0, column=2, padx=(0,10))
+        voterSexLabel.grid(row=0, column=3, padx=(0,10))
+        voterVotedLabel.grid(row=0, column=4, padx=(0,10))
+
+        for i in range(1,len(voterListData)):
+            Label(canvasFrame, text=f"{voterListData[i][0]}", font="mont").grid(row=i+1, column=0, sticky=EW, padx=(150,10))
+            Label(canvasFrame, text=f"{voterListData[i][1]}", font="mont").grid(row=i+1, column=1, sticky=EW, padx=(0,10))
+            Label(canvasFrame, text=f"{voterListData[i][2]}", font="mont").grid(row=i+1, column=2, sticky=EW, padx=(0,10))
+            Label(canvasFrame, text=f"{voterListData[i][3]}", font="mont").grid(row=i+1, column=3, sticky=EW, padx=(0,10))
+            if voterListData[i][4] == "Y":
+                Label(canvasFrame, text=f"Yes", font="mont").grid(row=i+1, column=4, sticky=EW)
+            else:
+                Label(canvasFrame, text=f"No", font="mont").grid(row=i+1, column=4, sticky=EW)
 
 def showCandList():
     hidePanel(candConfigFrame)
@@ -111,10 +133,28 @@ def showCandList():
     candListSep = ttk.Separator(ListFrame)
     fromCandListBtn.grid(row=2, padx=(7,0), columnspan=2, pady=(15,0))
     candListSep.grid(row=1, columnspan=2, sticky=EW, ipady=2)
+    errorLabel = Label(canvasFrame, text="No Candidate details found in database.\nYou can create new Candidate Details from the previous menu.", font="mont", justify=CENTER)
+    if candListData == []:
+        errorLabel.grid(row=0, column=0, padx=(90,0), pady=(250,0))
+    else:
+        errorLabel.grid_forget()
+        candIDLabel = ttk.Label(canvasFrame, text="ID", font="mont", justify=CENTER)
+        candNameLabel = ttk.Label(canvasFrame, text="Name", font="mont", justify=CENTER)
+        candAgeLabel = ttk.Label(canvasFrame, text="Age", font="mont", justify=CENTER)
+        candSexLabel = ttk.Label(canvasFrame, text="Sex", font="mont", justify=CENTER)
+        candSymbolLabel = ttk.Label(canvasFrame,text="Symbol", font="mont", justify=CENTER)
 
-    for i in range(1,len(candListData)):
-        if candListData[i] != []:
-            Label(canvasFrame, text=f"ID: {candListData[i][0]}   Name: {candListData[i][1]}   Age: {candListData[i][2]}   Sex: {candListData[i][3]}   Symbol: {candListData[i][4]}", font="mont").grid(row=i+1, column=0, sticky=W)
+        candIDLabel.grid(row=0, column=0, padx=(100,0))
+        candNameLabel.grid(row=0, column=1)
+        candAgeLabel.grid(row=0, column=2)
+        candSexLabel.grid(row=0, column=3)
+        candSymbolLabel.grid(row=0, column=4)
+        for i in range(1,len(candListData)):
+            Label(canvasFrame, text=f"{candListData[i][0]}", font="mont").grid(row=i+1, column=0, sticky=W, padx=(100,10))
+            Label(canvasFrame, text=f"Name: {candListData[i][1]}", font="mont").grid(row=i+1, column=1, sticky=W, padx=(0,10))
+            Label(canvasFrame, text=f"Age: {candListData[i][2]}", font="mont").grid(row=i+1, column=2, sticky=W, padx=(0,10))
+            Label(canvasFrame, text=f"Sex: {candListData[i][3]}", font="mont").grid(row=i+1, column=3, sticky=W, padx=(0,10))
+            Label(canvasFrame, text=f"Symbol: {candListData[i][4]}", font="mont").grid(row=i+1, column=4, sticky=W)
 
 def showVoteSessList():
     hidePanel(setVoteSessFrame)
@@ -143,7 +183,7 @@ def showVoteSessList():
     ListSep = ttk.Separator(ListFrame)
     fromVoteSessListBtn.grid(row=2, padx=(7,0), columnspan=2, pady=(15,0))
     ListSep.grid(row=1, columnspan=2, sticky=EW, ipady=2)
-    errorLabel = Label(canvasFrame, text="No sessions exist as of now. Details of any sessions you create are shown here.\n Please create a session from the previous panel.", font="mont", justify=CENTER)
+    errorLabel = Label(canvasFrame, text="No sessions exist as of now. Details of any sessions you create are shown here.\n Please create a session from the previous menu.", font="mont", justify=CENTER)
 
     if voteSessData == []:
         errorLabel.grid(row=0, column=0, padx=(90,0), pady=(250,0))
@@ -346,7 +386,7 @@ def adminUpdateSubmit():
         for i in l:
             pickle.dump(i, f)
 
-def setVoteSessSubmit():
+def setVoteSessSubmit(event = None):
     sessionID = str(uuid.uuid4()).split("-")[0]
     post = elecPostData.get()
     boothNo = boothNumData.get()
@@ -367,6 +407,21 @@ def setVoteSessSubmit():
             w_o.writerows(voteCount)
 
         messagebox.showinfo(title="Success!", message="Successfully created new voting session!")
+
+def startVoteSessSubmit(event = None):
+    sessionID = startVoteSessIDData.get()
+    found = False
+    sessionData = fetchSettings()
+    startVoteSessErrorLabel.grid_forget()
+    for i in sessionData:
+        if i["Session ID"] == sessionID:
+            found = True
+            break
+    if found:
+        startVoteSessErrorLabel.grid_forget()
+        openVoteSessWin()
+    else:
+        startVoteSessErrorLabel.grid(row=3, column=0, columnspan=2)
 
 #Show/Hide Panel Commands
 def showPanel(frameName):
@@ -431,6 +486,14 @@ def openSetVoteSessWin():
     hidePanel(adminFrame)
     showPanel(setVoteSessFrame)
 
+def openStartVoteSessWin():
+    hidePanel(adminFrame)
+    showPanel(startVoteSessFrame)
+
+def openVoteSessWin():
+    hidePanel(startVoteSessFrame)
+    showPanel(voteSessFrame)
+
 #Close/Hide Windows
 def fromAdminSettings():
     hidePanel(adminSettingsFrame)
@@ -488,10 +551,13 @@ def fromVoteSessList():
     hidePanel(ListFrame)
     showPanel(setVoteSessFrame)
 
+def fromStartVoteSess():
+    hidePanel(startVoteSessFrame)
+    showPanel(adminFrame)
+
 def adminLogout():
     hidePanel(adminFrame)
     showPanel(mainFrame)
-
 
 #main window widgets
 mainFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
@@ -517,7 +583,7 @@ adminLabelSep = ttk.Separator(adminFrame)
 voterOpBtn = ttk.Button(adminFrame, text="Configure Voters' List", style="my.TButton", command=openVoterConfigWin)
 candidateOpBtn = ttk.Button(adminFrame, text="Configure Candidates' List", style="my.TButton", command=openCandWin)
 setVoteSessionBtn = ttk.Button(adminFrame, text="Setup Voting Session", style="my.TButton", command=openSetVoteSessWin)
-startVoterSessionBtn = ttk.Button(adminFrame, text="Start a Voting Session", style="my.TButton", padding=(25,3,25,3))
+startVoterSessionBtn = ttk.Button(adminFrame, text="Start a Voting Session", style="my.TButton", padding=(25,3,25,3), command=openStartVoteSessWin)
 adminSettingBtn = ttk.Button(adminFrame, text="Admin Settings", style="my.TButton", command=openAdminSettingsWin)
 adminLogoutBtn = ttk.Button(adminFrame, text="Logout", style="my.TButton", padding=(20,3,20,3), command=adminLogout)
 
@@ -748,8 +814,22 @@ setVoteSessFrame.pack_forget()
 
 #Start Voting Session
 startVoteSessFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
+startVoteSessIDLabel = ttk.Label(startVoteSessFrame, text="Enter Session ID:", font="mont")
+startVoteSessIDEntry = ttk.Entry(startVoteSessFrame, textvariable=startVoteSessIDData, font="mont")
+startVoteSessSubmitBtn = ttk.Button(startVoteSessFrame, text="Submit", style="my.TButton", command=startVoteSessSubmit)
+fromStartVoteSessBtn = ttk.Button(startVoteSessFrame, text="< Back", style="my.TButton", command=fromStartVoteSess)
+startVoteSessErrorLabel = ttk.Label(startVoteSessFrame, text="Sorry no such Session ID exists!", font="mont")
 
-openDebugWin()
+startVoteSessIDLabel.grid(row=1, column=0)
+startVoteSessIDEntry.grid(row=1, column=1)
+startVoteSessSubmitBtn.grid(row=2, column=0, columnspan=2)
+fromStartVoteSessBtn.grid(row=0, column=0, sticky=NW, padx=(7,0), pady=(7,0))
+
+startVoteSessFrame.pack_forget()
+
+#Vote Session Frame
+voteSessFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
+
 
 if fetchAdminUsers() == []:
     fromAdminAddBtn.grid_forget()
@@ -757,5 +837,6 @@ if fetchAdminUsers() == []:
 else:
     showPanel(mainFrame)
 
+openDebugWin()
 root.bind("<Return>", submitOnClick)
 root.mainloop()
