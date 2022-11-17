@@ -18,8 +18,6 @@ y = (screenHeight/2) - (winHeight/2)
 root.geometry(f"{winWidth}x{winHeight}+{int(x)}+{int(y)}")
 root.resizable(0,0)
 
-crntPanel = ""
-
 #btn style
 btnstyle = ttk.Style().configure("my.TButton", font=("mont",))
 #radiobtn style
@@ -75,7 +73,7 @@ def showVoterList():
     ListCanvas.create_window((0,0), window=canvasFrame, anchor=NW)
     voterListData = fetchVoters()
     
-    fromVoterListBtn = ttk.Button(ListFrame, text="< Back", style="my.TButton", command=fromVoterList)
+    fromVoterListBtn = ttk.Button(ListFrame, text="< Back", style="my.TButton", command=goBack)
     fromVoterListBtn.grid(row=2, padx=(7,0), columnspan=2, pady=(15,0))
     voterListSep = ttk.Separator(ListFrame)
     voterListSep.grid(row=1, columnspan=2, sticky=EW, ipady=2)
@@ -129,7 +127,7 @@ def showCandList():
     ListCanvas.create_window((0,0), window=canvasFrame, anchor=NW)
     candListData = fetchCandidates()
 
-    fromCandListBtn = ttk.Button(ListFrame, text="< Back", style="my.TButton", command=fromCandList)
+    fromCandListBtn = ttk.Button(ListFrame, text="< Back", style="my.TButton", command=goBack)
     candListSep = ttk.Separator(ListFrame)
     fromCandListBtn.grid(row=2, padx=(7,0), columnspan=2, pady=(15,0))
     candListSep.grid(row=1, columnspan=2, sticky=EW, ipady=2)
@@ -179,7 +177,7 @@ def showVoteSessList():
     ListCanvas.create_window((0,0), window=canvasFrame, anchor=NW)
     voteSessData = fetchSettings()
 
-    fromVoteSessListBtn = ttk.Button(ListFrame, text="< Back", style="my.TButton", command=fromVoteSessList)
+    fromVoteSessListBtn = ttk.Button(ListFrame, text="< Back", style="my.TButton", command=goBack)
     ListSep = ttk.Separator(ListFrame)
     fromVoteSessListBtn.grid(row=2, padx=(7,0), columnspan=2, pady=(15,0))
     ListSep.grid(row=1, columnspan=2, sticky=EW, ipady=2)
@@ -421,7 +419,7 @@ def startVoteSessSubmit(event = None):
         startVoteSessErrorLabel.grid_forget()
         openVoteSessWin()
     else:
-        startVoteSessErrorLabel.grid(row=3, column=0, columnspan=2)
+        startVoteSessErrorLabel.grid(row=3, column=0, columnspan=2) 
 
 #Show/Hide Panel Commands
 def showPanel(frameName):
@@ -434,126 +432,108 @@ def hidePanel(frameName):
     except:
         pass
 
+def goBack():
+    global crntFrame, prevFrame
+    hidePanel(crntFrame)
+    showPanel(prevFrame)
+
 #Open Window Commands
 def openAdminWin():
+    global crntFrame, prevFrame
     hidePanel(mainFrame)
     showPanel(adminFrame)
-    crntPanel = "adminWin"
+    crntFrame = adminFrame
 
 def openCandWin():
+    global crntFrame, prevFrame
     hidePanel(adminFrame)
     showPanel(candConfigFrame)
+    prevFrame = adminFrame
+    crntFrame = candConfigFrame
 
 def openAdminSettingsWin():
-    crntPanel = "adminSettings"
+    global crntFrame, prevFrame
+    prevFrame = adminFrame
+    crntFrame = adminSettingsFrame
     hidePanel(adminFrame)
     showPanel(adminSettingsFrame)
 
 def openVoterConfigWin():
-    crntPanel = "voterConfig"
+    global crntFrame, prevFrame
+    crntFrame = voterConfigFrame
+    prevFrame = adminFrame
     hidePanel(adminFrame)
     showPanel(voterConfigFrame)
 
 def openVoterAddWin():
+    global crntFrame, prevFrame
+    crntFrame = voterAddFrame
+    prevFrame = voterConfigFrame
     hidePanel(voterConfigFrame)
     showPanel(voterAddFrame)
 
 def openVoterDelWin():
+    global crntFrame, prevFrame
+    crntFrame = candAddFrame
+    prevFrame = voterConfigFrame
     hidePanel(voterConfigFrame)
     showPanel(voterDelFrame)
 
 def openCandAddWin():
+    global crntFrame, prevFrame
+    crntFrame = candAddFrame
+    prevFrame = candConfigFrame
     hidePanel(candConfigFrame)
     showPanel(candAddFrame)
 
 def openCandDelWin():
+    global crntFrame, prevFrame
+    crntFrame = candDelFrame
+    prevFrame = candConfigFrame
     hidePanel(candConfigFrame)
     showPanel(candDelFrame)
 
 def openAdminAddWin():
+    global crntFrame, prevFrame
+    crntFrame = adminAddFrame
+    prevFrame = adminSettingsFrame
     hidePanel(adminSettingsFrame)
     showPanel(adminAddFrame)
 
 def openAdminDelWin():
+    global crntFrame, prevFrame
+    crntFrame = adminDelFrame
+    prevFrame = adminSettingsFrame
     hidePanel(adminSettingsFrame)
     showPanel(adminDelFrame)
 
 def openAdminUpdateWin():
+    global crntFrame, prevFrame
+    crntFrame = adminUpdateFrame
+    prevFrame = adminSettingsFrame
     hidePanel(adminSettingsFrame)
     showPanel(adminUpdateFrame)
 
 def openSetVoteSessWin():
+    global crntFrame, prevFrame
+    crntFrame = setVoteSessFrame
+    prevFrame = adminFrame
     hidePanel(adminFrame)
     showPanel(setVoteSessFrame)
 
 def openStartVoteSessWin():
+    global crntFrame, prevFrame
+    crntFrame = startVoteSessFrame
+    prevFrame = adminFrame
     hidePanel(adminFrame)
     showPanel(startVoteSessFrame)
 
 def openVoteSessWin():
+    global crntFrame, prevFrame
+    crntFrame = voteSessFrame
+    prevFrame = startVoteSessFrame
     hidePanel(startVoteSessFrame)
     showPanel(voteSessFrame)
-
-#Close/Hide Windows
-def fromAdminSettings():
-    hidePanel(adminSettingsFrame)
-    openAdminWin()
-
-def fromVoterConfig():
-    hidePanel(voterConfigFrame)
-    openAdminWin()
-
-def fromCandConfig():
-    hidePanel(candConfigFrame)
-    openAdminWin()
-
-def fromVoterList():
-    hidePanel(ListFrame)
-    showPanel(voterConfigFrame)
-
-def fromAddVoter():
-    hidePanel(voterAddFrame)
-    showPanel(voterConfigFrame)
-
-def fromCandAdd():
-    hidePanel(candAddFrame)
-    showPanel(candConfigFrame)
-
-def fromCandDel():
-    hidePanel(candDelFrame)
-    showPanel(candConfigFrame)
-
-def fromVoterDel():
-    hidePanel(voterDelFrame)
-    showPanel(voterConfigFrame)
-
-def fromCandList():
-    hidePanel(ListFrame)
-    showPanel(candConfigFrame)
-
-def fromAdminAdd():
-    hidePanel(adminAddFrame)
-    showPanel(adminSettingsFrame)
-
-def fromAdminDel():
-    hidePanel(adminDelFrame)
-    showPanel(adminSettingsFrame)
-
-def fromAdminUpdate():
-    hidePanel(adminUpdateFrame)
-    showPanel(adminSettingsFrame)
-
-def fromSetVoteSess():
-    hidePanel(setVoteSessFrame)
-    showPanel(adminFrame)
-
-def fromVoteSessList():
-    hidePanel(ListFrame)
-    showPanel(setVoteSessFrame)
-
-def fromStartVoteSess():
-    hidePanel(startVoteSessFrame)
-    showPanel(adminFrame)
 
 def adminLogout():
     hidePanel(adminFrame)
@@ -605,7 +585,7 @@ adminSetttingLabelSep = ttk.Separator(adminSettingsFrame)
 addAdminProfile = ttk.Button(adminSettingsFrame, text="Create a new Admin Profile", style="my.TButton", command=openAdminAddWin)
 delAdminProfile = ttk.Button(adminSettingsFrame, text="Delete an Admin Profile   ", style="my.TButton", command=openAdminDelWin)
 updateAdminProfile = ttk.Button(adminSettingsFrame, text="Update an Admin Profile", style="my.TButton", command=openAdminUpdateWin)
-backButton = ttk.Button(adminSettingsFrame, text="< Back", style="my.TButton", command=fromAdminSettings)
+backButton = ttk.Button(adminSettingsFrame, text="< Back", style="my.TButton", command=goBack)
 
 adminSetttingLabel.grid(row=1, column=0, columnspan=2, pady=(150,15), padx=(150,0))
 adminSetttingLabelSep.grid(row=2, column=0, columnspan=2, padx=(150,0), pady=(0,10), ipady=2, sticky=EW)
@@ -623,7 +603,7 @@ adminAddNameEntry = ttk.Entry(adminAddFrame, textvariable=adminNameData, font="m
 adminAddPassLabel = ttk.Label(adminAddFrame, text="Enter Admin Password:", font="mont")
 adminAddPassEntry = ttk.Entry(adminAddFrame, textvariable=adminPassData, font="mont")
 adminAddSubmitBtn = ttk.Button(adminAddFrame, text="Submit", style="my.TButton", command=adminAddSubmit)
-fromAdminAddBtn = ttk.Button(adminAddFrame, text="< Back", style="my.TButton", command=fromAdminAdd)
+fromAdminAddBtn = ttk.Button(adminAddFrame, text="< Back", style="my.TButton", command=goBack)
 
 adminAddNameLabel.grid(row=1, column=0, sticky=W, pady=(170,10), padx=(200,10))
 adminAddNameEntry.grid(row=1, column=1, pady=(170,10))
@@ -641,7 +621,7 @@ adminDelNameEntry = ttk.Entry(adminDelFrame, font="mont", textvariable=adminName
 adminDelPassLabel = ttk.Label(adminDelFrame, text="Enter Admin Password:", font="mont")
 adminDelPassEntry = ttk.Entry(adminDelFrame, font="mont", textvariable=adminPassData)
 adminDelSubmitBtn = ttk.Button(adminDelFrame, text="Submit", style="my.TButton", command=adminDelSubmit)
-fromAdminDelBtn = ttk.Button(adminDelFrame, text="< Back", style="my.TButton", command=fromAdminDel)
+fromAdminDelBtn = ttk.Button(adminDelFrame, text="< Back", style="my.TButton", command=goBack)
 
 adminDelNameLabel.grid(row=1, column=0, sticky=W, pady=(170,10), padx=(200,10))
 adminDelNameEntry.grid(row=1, column=1, pady=(170,10))
@@ -661,7 +641,7 @@ adminUpdatePassEntry = ttk.Entry(adminUpdateFrame, textvariable=adminPassData, f
 adminUpdateNewPassLabel = ttk.Label(adminUpdateFrame, text="Enter New Password:", font="mont")
 adminUpdateNewPassEntry = ttk.Entry(adminUpdateFrame, textvariable=adminNewPassData, font="mont", show="*")
 adminUpdateSubmitBtn = ttk.Button(adminUpdateFrame, text="Submit", style="my.TButton", command=adminUpdateSubmit)
-fromAdminUpdateBtn = ttk.Button(adminUpdateFrame, text="< Back", style="my.TButton", command=fromAdminUpdate)
+fromAdminUpdateBtn = ttk.Button(adminUpdateFrame, text="< Back", style="my.TButton", command=goBack)
 adminUpdateErrorLabel = ttk.Label(adminUpdateFrame, text="Error! No such Admin Name exists\nwithin database!", justify=CENTER, font="mont")
 
 adminUpdateNameLabel.grid(row=1, column=0, sticky=W, pady=(150,10), padx=(200,10))
@@ -682,7 +662,7 @@ voterConfigLabelSep = ttk.Separator(voterConfigFrame)
 addAVoterRecord = ttk.Button(voterConfigFrame, text="Add a new voter record", style="my.TButton", command=openVoterAddWin)
 delAVoterRecord = ttk.Button(voterConfigFrame, text="Delete a voter record", style="my.TButton", command=openVoterDelWin)
 displayVoters_ = ttk.Button(voterConfigFrame, text="Display Voter List", style="my.TButton", command=showVoterList)
-fromVoterConfigBtn = ttk.Button(voterConfigFrame, text="< Back", style="my.TButton", command=fromVoterConfig)
+fromVoterConfigBtn = ttk.Button(voterConfigFrame, text="< Back", style="my.TButton", command=goBack)
 
 voterConfigLabel.grid(row=1, column=0, columnspan=2, pady=(170,0), padx=(150,0))
 voterConfigLabelSep.grid(row=2, column=0, ipady=2, sticky=EW, columnspan=2, padx=(130,0), pady=(10,10))
@@ -703,7 +683,7 @@ voterNameAddEntry = ttk.Entry(voterAddFrame, font="mont", textvariable=voterName
 voterChooseGenderMenu = ttk.OptionMenu(voterAddFrame, genderData, *genders, style="my.TOptionMenu")
 voterChooseGenderLabel = ttk.Label(voterAddFrame, text="Choose Voter Gender", font="mont")
 voterAddSubmitBtn = ttk.Button(voterAddFrame, text="Submit", style="my.TButton", command=voterAddSubmit)
-fromAddVoterBtn = ttk.Button(voterAddFrame, text="< Back", style="my.TButton", command=fromAddVoter)
+fromAddVoterBtn = ttk.Button(voterAddFrame, text="< Back", style="my.TButton", command=goBack)
 
 fromAddVoterBtn.grid(row=0, column=0, padx=(7,0), pady=(7,0), sticky=NW)
 voterNameAddLabel.grid(row=1, column=0, sticky=W, padx=(175,0), pady=(175,10))
@@ -721,7 +701,7 @@ voterDelFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 voterDelLabel = ttk.Label(voterDelFrame, text="Enter UID of Voter:", font="mont")
 voterDelEntry = ttk.Entry(voterDelFrame, textvariable=voterDelData, font="mont")
 voterDelSubmitBtn = ttk.Button(voterDelFrame, text="Submit", style="my.TButton", command=voterDelSubmit)
-fromVoterDelBtn = ttk.Button(voterDelFrame, text="< Back", style="my.TButton", command = fromVoterDel)
+fromVoterDelBtn = ttk.Button(voterDelFrame, text="< Back", style="my.TButton", command = goBack)
 
 voterDelLabel.grid(row=1, column=0, sticky=W, padx=(200,10), pady=(175,0))
 voterDelEntry.grid(row=1, column=1, pady=(175,0))
@@ -737,7 +717,7 @@ candConfigLabelSep = ttk.Separator(candConfigFrame)
 addACandRecord = ttk.Button(candConfigFrame, text="Add a new Candidate record", style="my.TButton", command=openCandAddWin)
 delACandRecord = ttk.Button(candConfigFrame, text="Delete a Candidate record", style="my.TButton", command=openCandDelWin)
 displayCand = ttk.Button(candConfigFrame, text="Display Candidate List", style="my.TButton", command=showCandList)
-fromCandConfigBtn = ttk.Button(candConfigFrame, text="< Back", style="my.TButton", command=fromCandConfig)
+fromCandConfigBtn = ttk.Button(candConfigFrame, text="< Back", style="my.TButton", command=goBack)
 
 candConfigLabel.grid(row=1, column=0, columnspan=2, pady=(170,0), padx=(110,0))
 candConfigLabelSep.grid(row=2, column=0, ipady=2, sticky=EW, columnspan=2, padx=(90,0), pady=(10,10))
@@ -761,7 +741,7 @@ candDescAddEntry = ttk.Entry(candAddFrame, font="mont", textvariable=candDescDat
 candChooseGenderMenu = ttk.OptionMenu(candAddFrame, genderData, *genders, style="my.TOptionMenu")
 candChooseGenderLabel = ttk.Label(candAddFrame, text="Choose Candidate Gender", font="mont")
 candAddSubmitBtn = ttk.Button(candAddFrame, text="Submit", style="my.TButton", command=candAddSubmit)
-fromCandAddBtn = ttk.Button(candAddFrame, text="< Back", style="my.TButton", command=fromCandAdd)
+fromCandAddBtn = ttk.Button(candAddFrame, text="< Back", style="my.TButton", command=goBack)
 
 candNameAddLabel.grid(row=1, column=0, sticky=W, pady=(125,0), padx=(175,10))
 candNameAddEntry.grid(row=1, column=1, pady=(125,10))
@@ -783,7 +763,7 @@ candDelFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 candDelLabel = ttk.Label(candDelFrame, text="Enter UID of Candidate:", font="mont")
 candDelEntry = ttk.Entry(candDelFrame, textvariable=candDelData, font="mont")
 candDelSubmitBtn = ttk.Button(candDelFrame, text="Submit", style="my.TButton", command=candDelSubmit)
-fromCandDelBtn = ttk.Button(candDelFrame, text="< Back", style="my.TButton", command=fromCandDel)
+fromCandDelBtn = ttk.Button(candDelFrame, text="< Back", style="my.TButton", command=goBack)
 
 candDelLabel.grid(row=1, column=0, sticky=W, padx=(200,10), pady=(175,0))
 candDelEntry.grid(row=1, column=1, pady=(175,0))
@@ -800,7 +780,7 @@ boothNumLabel = ttk.Label(setVoteSessFrame, text="Enter Booth Number:", font="mo
 boothNumEntry = ttk.Entry(setVoteSessFrame, textvariable=boothNumData, font="mont")
 setVoteSessSubmitBtn = ttk.Button(setVoteSessFrame, text="Submit", style="my.TButton", command=setVoteSessSubmit)
 showVoteSessBtn = ttk.Button(setVoteSessFrame, text="Show Sessions", style="my.TButton", command=showVoteSessList)
-fromSetVoteSessBtn = ttk.Button(setVoteSessFrame, text="< Back", style="my.TButton", command=fromSetVoteSess)
+fromSetVoteSessBtn = ttk.Button(setVoteSessFrame, text="< Back", style="my.TButton", command=goBack)
 
 elecPostSessLabel.grid(row=1, column=0, sticky=W, padx=(200,10), pady=(175,10))
 elecPostSessEntry.grid(row=1, column=1, pady=(175,10))
@@ -817,7 +797,7 @@ startVoteSessFrame = ttk.Frame(root, borderwidth=2, relief=SOLID)
 startVoteSessIDLabel = ttk.Label(startVoteSessFrame, text="Enter Session ID:", font="mont")
 startVoteSessIDEntry = ttk.Entry(startVoteSessFrame, textvariable=startVoteSessIDData, font="mont")
 startVoteSessSubmitBtn = ttk.Button(startVoteSessFrame, text="Submit", style="my.TButton", command=startVoteSessSubmit)
-fromStartVoteSessBtn = ttk.Button(startVoteSessFrame, text="< Back", style="my.TButton", command=fromStartVoteSess)
+fromStartVoteSessBtn = ttk.Button(startVoteSessFrame, text="< Back", style="my.TButton", command=goBack)
 startVoteSessErrorLabel = ttk.Label(startVoteSessFrame, text="Sorry no such Session ID exists!", font="mont")
 
 startVoteSessIDLabel.grid(row=1, column=0)
